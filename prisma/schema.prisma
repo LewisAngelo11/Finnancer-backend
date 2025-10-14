@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model balance {
+  id_balance      Int      @id @default(autoincrement())
+  total_ingreso   Decimal  @db.Decimal(14, 2)
+  total_egreso    Decimal  @db.Decimal(14, 2)
+  resultado_neto  Decimal  @db.Decimal(14, 2)
+  presupuesto     Decimal  @db.Decimal(14, 2)
+  ahorro_mensual  Decimal  @default(0.00) @db.Decimal(14, 2)
+  resultado_final Decimal  @db.Decimal(14, 2)
+  id_usuario      Int?
+  usuario         usuario? @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model categoria {
+  id_categoria Int             @id @default(autoincrement())
+  nombre       String          @db.VarChar(50)
+  tipo         tipo_movimiento @default(ingreso)
+  estatus      estatus         @default(activo)
+  flujo        flujo_efectivo  @default(efectivo)
+  id_usuario   Int?
+  usuario      usuario?        @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  persona      persona[]
+  subcategoria subcategoria[]
+  transaccion  transaccion[]
+}
+
+model notificacion {
+  id_notificacion    Int      @id @default(autoincrement())
+  descripcion        String   @db.VarChar(100)
+  fecha_notificacion DateTime @default(now()) @db.Date
+  id_usuario         Int?
+  id_perfil          Int?
+  perfil             perfil?  @relation(fields: [id_perfil], references: [id_perfil], onDelete: NoAction, onUpdate: NoAction)
+  usuario            usuario? @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model perfil {
+  id_perfil      Int            @id @default(autoincrement())
+  nombre         String         @db.VarChar(50)
+  icono          Int?
+  fecha_creacion DateTime       @default(now()) @db.Date
+  estatus        estatus        @default(activo)
+  id_usuario     Int?
+  notificacion   notificacion[]
+  usuario        usuario?       @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  transaccion    transaccion[]
+}
+
+model persona {
+  id_persona   Int          @id @default(autoincrement())
+  nombre       String       @db.VarChar(100)
+  tipo         tipo_persona @default(cliente)
+  estatus      estatus      @default(activo)
+  id_usuario   Int?
+  id_categoria Int?
+  categoria    categoria?   @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  usuario      usuario?     @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model subcategoria {
+  id_subcategoria Int             @id @default(autoincrement())
+  nombre          String          @db.VarChar(50)
+  tipo            tipo_movimiento
+  estatus         estatus         @default(activo)
+  flujo           flujo_efectivo  @default(efectivo)
+  id_categoria    Int?
+  categoria       categoria?      @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model transaccion {
+  id_transaccion    Int                 @id @default(autoincrement())
+  tipo              tipo_movimiento
+  fecha_transaccion DateTime            @default(now()) @db.Date
+  nota              String?             @db.VarChar(100)
+  monto_total       Decimal             @db.Decimal(14, 2)
+  plazos            Int?                @default(1)
+  estatus           estatus_transaccion @default(pendiente)
+  id_categoria      Int?
+  id_usuario        Int?
+  id_perfil         Int?
+  categoria         categoria?          @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  perfil            perfil?             @relation(fields: [id_perfil], references: [id_perfil], onDelete: NoAction, onUpdate: NoAction)
+  usuario           usuario?            @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  transaccion_cuota transaccion_cuota[]
+}
+
+model transaccion_cuota {
+  id_cuota          Int                 @id @default(autoincrement())
+  id_transaccion    Int?
+  monto             Decimal             @db.Decimal(14, 2)
+  fecha_vencimiento DateTime            @db.Date
+  fecha_pago        DateTime?           @db.Date
+  estatus           estatus_transaccion @default(pendiente)
+  transaccion       transaccion?        @relation(fields: [id_transaccion], references: [id_transaccion], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model usuario {
+  id_usuario       Int            @id @default(autoincrement())
+  nombre           String         @db.VarChar(50)
+  apellido_paterno String         @db.VarChar(50)
+  apellido_materno String?        @db.VarChar(50)
+  correo           String         @db.VarChar(100)
+  contrasena       String         @db.VarChar(100)
+  fecha_creacion   DateTime       @default(now()) @db.Date
+  foto_perfil      String?
+  estatus          estatus        @default(activo)
+  presupuesto      Decimal        @default(0.00) @db.Decimal(14, 2)
+  ingreso_minimo   Decimal        @default(0.00) @db.Decimal(14, 2)
+  egreso_minimo    Decimal        @default(0.00) @db.Decimal(14, 2)
+  ahorro_mensual   Decimal        @default(0.00) @db.Decimal(14, 2)
+  balance          balance[]
+  categoria        categoria[]
+  notificacion     notificacion[]
+  perfil           perfil[]
+  persona          persona[]
+  transaccion      transaccion[]
+}
+
+enum estatus {
+  activo
+  baja
+}
+
+enum estatus_transaccion {
+  pendiente
+  pagada
+  cancelada
+}
+
+enum flujo_efectivo {
+  efectivo
+  cuenta_por_cobrar @map("cuenta por cobrar")
+  cuenta_por_pagar  @map("cuenta por pagar")
+}
+
+enum tipo_movimiento {
+  ingreso
+  egreso
+}
+
+enum tipo_persona {
+  cliente
+  proveedor
+}
