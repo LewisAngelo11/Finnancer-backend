@@ -115,7 +115,7 @@ model usuario {
   estatus          estatus        @default(activo)
   presupuesto      Decimal        @default(0.00) @db.Decimal(14, 2)
   ingreso_minimo   Decimal        @default(0.00) @db.Decimal(14, 2)
-  egreso_minimo    Decimal        @default(0.00) @db.Decimal(14, 2)
+  egreso_maximo    Decimal        @default(0.00) @db.Decimal(14, 2)
   ahorro_mensual   Decimal        @default(0.00) @db.Decimal(14, 2)
   balance          balance[]
   categoria        categoria[]
