@@ -108,7 +108,7 @@ model usuario {
   nombre           String         @db.VarChar(50)
   apellido_paterno String         @db.VarChar(50)
   apellido_materno String?        @db.VarChar(50)
-  correo           String         @db.VarChar(100)
+  correo           String         @unique(map: "usuario_correo_unique") @db.VarChar(100)
   contrasena       String         @db.VarChar(100)
   fecha_creacion   DateTime       @default(now()) @db.Date
   foto_perfil      String?
