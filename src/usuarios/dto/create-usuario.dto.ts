@@ -20,22 +20,4 @@ export class CreateUsuarioDto {
 
     @IsDate()
     fechaCreacion: Date;
-
-    @IsString()
-    fotoPerfil: string;
-    
-    @IsEnum(estatus)
-    estatus: estatus;
-
-    @IsNumber()
-    presupuesto: number;
-
-    @IsNumber()
-    ingresoMinimos: number;
-
-    @IsNumber()
-    egresoMaximos: number;
-
-    @IsNumber()
-    ahorroMensual: number;
 }

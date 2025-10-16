@@ -27,12 +27,6 @@ export class UsuariosService {
         correo: createUsuarioDto.correo,
         contrasena: createUsuarioDto.contrasena,
         fecha_creacion: createUsuarioDto.fechaCreacion,
-        foto_perfil: createUsuarioDto.fotoPerfil,
-        estatus: createUsuarioDto.estatus,
-        presupuesto: createUsuarioDto.presupuesto,
-        ingreso_minimo: createUsuarioDto.ingresoMinimos,
-        egreso_maximo: createUsuarioDto.egresoMaximos,
-        ahorro_mensual: createUsuarioDto.ahorroMensual
       },
     });
 
