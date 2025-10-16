@@ -11,7 +11,6 @@ export class UsuariosService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    
     //Hashear la contraseña antes de guardarla a la BD.
     const saltOrRounds = 10;
     const hash = createUsuarioDto.contrasena;
@@ -42,9 +41,10 @@ export class UsuariosService {
     };
   }
 
-  async findOne(id: number) {
+  // Función que busca un usuario por el correo electrónico
+  async findByCorreo(correo: string) {
     return await this.prisma.usuario.findUnique({
-      where: { id_usuario: id },
+      where: { correo },
     });
   }
 
