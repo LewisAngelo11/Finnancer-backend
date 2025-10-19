@@ -125,6 +125,15 @@ model usuario {
   transaccion      transaccion[]
 }
 
+model verificacion {
+  id_verificacon Int      @id @default(autoincrement())
+  nombre         String   @db.VarChar(150)
+  correo         String   @unique @db.VarChar(100)
+  codigo         Int
+  creado_en      DateTime @default(now()) @db.Timestamp(6)
+  expiracion     DateTime @db.Timestamp(6)
+}
+
 enum estatus {
   activo
   baja
