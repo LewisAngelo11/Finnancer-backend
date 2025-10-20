@@ -42,6 +42,22 @@ export class UsuariosService {
     });
   }
 
+  // Este método crea los parametros financieros del usuario
+  async createFinanceParams(correo: string, updateUsuarioDto: UpdateUsuarioDto) {
+    await this.prisma.usuario.update({
+      where: {
+        correo: correo
+      },
+      data: {
+        presupuesto: updateUsuarioDto.presupuesto,
+        ingreso_minimo: updateUsuarioDto.ingresos,
+        egreso_maximo: updateUsuarioDto.egresos,
+        ahorro_mensual: updateUsuarioDto.ahorroMensual,
+        dia_corte: Number(updateUsuarioDto.diaCorte),
+      },
+    });
+  }
+
   findAll() {
     return `This action returns all usuarios`;
   }

@@ -11,9 +11,9 @@ export class UsuariosController {
     return this.usuariosService.findAll();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+  @Patch(':correo')
+  update(@Param('correo') correo: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+    return this.usuariosService.createFinanceParams(correo, updateUsuarioDto);
   }
 
   @Delete(':id')
