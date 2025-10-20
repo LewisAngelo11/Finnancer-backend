@@ -117,12 +117,22 @@ model usuario {
   ingreso_minimo   Decimal        @default(0.00) @db.Decimal(14, 2)
   egreso_maximo    Decimal        @default(0.00) @db.Decimal(14, 2)
   ahorro_mensual   Decimal        @default(0.00) @db.Decimal(14, 2)
+  dia_corte        Int?
   balance          balance[]
   categoria        categoria[]
   notificacion     notificacion[]
   perfil           perfil[]
   persona          persona[]
   transaccion      transaccion[]
+}
+
+model verificacion {
+  id_verificacon Int      @id @default(autoincrement())
+  nombre         String   @db.VarChar(150)
+  correo         String   @db.VarChar(100)
+  codigo         Int
+  creado_en      DateTime @default(now()) @db.Timestamp(6)
+  expiracion     DateTime @db.Timestamp(6)
 }
 
 enum estatus {
