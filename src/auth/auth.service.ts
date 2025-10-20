@@ -6,17 +6,20 @@ import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt'; // Importar bcrypt para hashear la contra del usuario
 import { MailService } from 'src/mail/mail.service'; // Importar el servicio de Mail
 import { VerificationService } from 'src/verification/verification.service';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UsuariosService, 
         private mailService: MailService,
-        private verificationService: VerificationService
+        private verificationService: VerificationService,
+        private jwtService: JwtService
     ) {}
     
-    // Método para iniciar sesión (Falta agregar el token JWT)
-    async signIn(authDto: AuthDto): Promise<any> {
+    // Método para iniciar sesión
+    async signIn(authDto: AuthDto): Promise<{ access_token: string }> {
         const usuario = await this.userService.findByCorreo(authDto.correo);
 
         // Verifica que el usuario exista
@@ -31,13 +34,16 @@ export class AuthService {
         if (!passwordHash) {
             throw new UnauthorizedException('Contraseña incorrecta');
         }
-        // Extrae el atributo contraseña en el result
-        const { contrasena, ...result } = usuario;
-        return result;
+        
+        // Crea y retorna el token JWT
+        const payload = { sub: usuario.id_usuario, mail: usuario.correo };
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+        };
     }
 
     // Método para registrar un usuario nuevo
-    async signUp(createUsuarioDto: CreateUsuarioDto): Promise<any> {
+    async signUp(createUsuarioDto: CreateUsuarioDto): Promise<{ access_token: string, mensaje: string }> {
         const fechaActual = new Date();
         // Buscar el código de verificación asociado al correo
         const codigoVerificacion = await this.verificationService.getVerificationCode(createUsuarioDto.correo);
@@ -59,8 +65,13 @@ export class AuthService {
             throw new UnauthorizedException('Error al abrir la cuenta');
         }
 
+        // Crear token directamente sin necesidad de llamar a signIn
+        const payload = { sub: newUsuario.id_usuario, mail: newUsuario.correo };
+        const access_token = await this.jwtService.signAsync(payload);
+
         return {
-            menssage: 'Bienvenido a Finnancer'
+            mensaje: 'Bienvenido a Finnancer',
+            access_token
         };
     }
 

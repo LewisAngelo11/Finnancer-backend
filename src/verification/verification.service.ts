@@ -24,8 +24,9 @@ export class VerificationService {
     }
 
     async getVerificationCode(correo: string) {
-        return await this.prisma.verificacion.findUnique({
+        return await this.prisma.verificacion.findFirst({
             where: { correo },
+            orderBy: { creado_en: 'desc' },
         });
     }
 }

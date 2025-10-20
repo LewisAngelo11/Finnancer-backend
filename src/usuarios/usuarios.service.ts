@@ -3,6 +3,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'; // Importar bcrypt para hashear la contra del usuario
+import { Usuario } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuariosService {
@@ -19,7 +20,7 @@ export class UsuariosService {
     createUsuarioDto.contrasena = passHash;
     createUsuarioDto.fechaCreacion = this.fechaAlta;
 
-    await this.prisma.usuario.create({
+    const usuarioCreado = await this.prisma.usuario.create({
       data: {
         nombre: createUsuarioDto.nombre,
         apellido_paterno: createUsuarioDto.apellidoP,
@@ -30,9 +31,7 @@ export class UsuariosService {
       },
     });
 
-    return {
-      mensaje: 'Usuario registrado correctamente',
-    };
+    return usuarioCreado; // Retorna el usuario creado
   }
 
   // Función que busca un usuario por el correo electrónico

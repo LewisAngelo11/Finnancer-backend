@@ -1,21 +1,15 @@
-import { Body, Controller, Post} from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { CreateUsuarioDto } from 'src/usuarios/dto/create-usuario.dto';
-
-// Body para enviar un correo electrónico
-class SendMailDto {
-    to: string;
-    name: string;
-    code: number;
-}
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
     // Endpoint de login
-    @Post()
+    @HttpCode(HttpStatus.OK)
+    @Post('login')
     signIn(@Body() authDto: AuthDto ) {
         return this.authService.signIn(authDto);
     }
