@@ -3,6 +3,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'; // Importar bcrypt para hashear la contra del usuario
+import { Usuario } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuariosService {
@@ -11,7 +12,6 @@ export class UsuariosService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    
     //Hashear la contraseña antes de guardarla a la BD.
     const saltOrRounds = 10;
     const hash = createUsuarioDto.contrasena;
@@ -20,7 +20,7 @@ export class UsuariosService {
     createUsuarioDto.contrasena = passHash;
     createUsuarioDto.fechaCreacion = this.fechaAlta;
 
-    await this.prisma.usuario.create({
+    const usuarioCreado = await this.prisma.usuario.create({
       data: {
         nombre: createUsuarioDto.nombre,
         apellido_paterno: createUsuarioDto.apellidoP,
@@ -28,23 +28,32 @@ export class UsuariosService {
         correo: createUsuarioDto.correo,
         contrasena: createUsuarioDto.contrasena,
         fecha_creacion: createUsuarioDto.fechaCreacion,
-        foto_perfil: createUsuarioDto.fotoPerfil,
-        estatus: createUsuarioDto.estatus,
-        presupuesto: createUsuarioDto.presupuesto,
-        ingreso_minimo: createUsuarioDto.ingresoMinimos,
-        egreso_maximo: createUsuarioDto.egresoMaximos,
-        ahorro_mensual: createUsuarioDto.ahorroMensual
       },
     });
 
-    return {
-      mensaje: 'Usuario registrado correctamente',
-    };
+    return usuarioCreado; // Retorna el usuario creado
   }
 
-  async findOne(id: number) {
+  // Función que busca un usuario por el correo electrónico
+  async findByCorreo(correo: string) {
     return await this.prisma.usuario.findUnique({
-      where: { id_usuario: id },
+      where: { correo },
+    });
+  }
+
+  // Este método crea los parametros financieros del usuario
+  async createFinanceParams(correo: string, updateUsuarioDto: UpdateUsuarioDto) {
+    await this.prisma.usuario.update({
+      where: {
+        correo: correo
+      },
+      data: {
+        presupuesto: updateUsuarioDto.presupuesto,
+        ingreso_minimo: updateUsuarioDto.ingresos,
+        egreso_maximo: updateUsuarioDto.egresos,
+        ahorro_mensual: updateUsuarioDto.ahorroMensual,
+        dia_corte: Number(updateUsuarioDto.diaCorte),
+      },
     });
   }
 

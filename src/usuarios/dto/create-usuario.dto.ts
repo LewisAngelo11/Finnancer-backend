@@ -1,5 +1,4 @@
-import { estatus } from "generated/prisma";
-import { IsNumber, IsString, IsEnum, IsDate } from 'class-validator';
+import { IsNumber, IsString, IsDate } from 'class-validator';
 
 
 export class CreateUsuarioDto {
@@ -21,21 +20,7 @@ export class CreateUsuarioDto {
     @IsDate()
     fechaCreacion: Date;
 
-    @IsString()
-    fotoPerfil: string;
-    
-    @IsEnum(estatus)
-    estatus: estatus;
-
+    // Este atributo es el codigo de verificación necesario para crear la cuenta
     @IsNumber()
-    presupuesto: number;
-
-    @IsNumber()
-    ingresoMinimos: number;
-
-    @IsNumber()
-    egresoMaximos: number;
-
-    @IsNumber()
-    ahorroMensual: number;
+    codigoVerificacion: number;
 }
