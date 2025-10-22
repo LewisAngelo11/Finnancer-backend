@@ -6,16 +6,23 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsuariosModule } from '../usuarios/usuarios.module';
 import { MailModule } from 'src/mail/mail.module';
 import { VerificationModule } from 'src/verification/verification.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [MailModule, PrismaModule, VerificationModule,
     UsuariosModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '3600s' }
+      signOptions: { expiresIn: '1h' }
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    }
+  ]
 })
 export class AuthModule {}

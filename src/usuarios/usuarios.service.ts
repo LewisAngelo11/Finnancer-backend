@@ -57,6 +57,19 @@ export class UsuariosService {
     });
   }
 
+  // Este método retorna los datos de un usuario sin la contraseña
+  async getInfoUsuario(correo: string) {
+    const usuarioConsultado = await this.findByCorreo(correo);
+
+    if (!usuarioConsultado) {
+      throw new Error('Usuario no encontrado.');
+    }
+    // Extrae la contraseña de los datos del usuario, por seguridad
+    const { contrasena, ...datosUsuarios } = usuarioConsultado;
+
+    return datosUsuarios;
+  }
+
   findAll() {
     return `This action returns all usuarios`;
   }
