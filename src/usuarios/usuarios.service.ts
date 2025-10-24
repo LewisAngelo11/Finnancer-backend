@@ -55,6 +55,10 @@ export class UsuariosService {
         dia_corte: Number(updateUsuarioDto.diaCorte),
       },
     });
+
+    return {
+      mensaje: '¡Datos actualizados correctamente!'
+    };
   }
 
   // Este método retorna los datos de un usuario sin la contraseña
@@ -68,17 +72,5 @@ export class UsuariosService {
     const { contrasena, ...datosUsuarios } = usuarioConsultado;
 
     return datosUsuarios;
-  }
-
-  findAll() {
-    return `This action returns all usuarios`;
-  }
-
-  update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    return `This action updates a #${id} usuario`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} usuario`;
   }
 }
