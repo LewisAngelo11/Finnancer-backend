@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Req } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
@@ -6,6 +6,12 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
   
+  @Patch('info')
+  updateInfo(@Req() req: any, @Body() body: any) {
+    const correo = req.usuario.mail; // Obtener el correo de la request
+    return this.usuariosService.updateInfo(correo, body);
+  }
+
   @Patch('update')
   updateFinance(@Req() req: any, @Body() body: any) {
     const correo = req.usuario.mail;

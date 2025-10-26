@@ -3,7 +3,6 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'; // Importar bcrypt para hashear la contra del usuario
-import { Usuario } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuariosService {
@@ -59,6 +58,25 @@ export class UsuariosService {
     return {
       mensaje: '¡Datos actualizados correctamente!'
     };
+  }
+
+  // Método que actualiza los datos personales del usuario autenticado
+  async updateInfo(correo: string, updateUsuarioDto: UpdateUsuarioDto) {
+    await this.prisma.usuario.update({
+      where: {
+        correo
+      },
+      data: {
+        nombre: updateUsuarioDto.nombre,
+        apellido_paterno: updateUsuarioDto.apellidoP,
+        apellido_materno: updateUsuarioDto.apellidoM,
+      },
+    });
+
+    return {
+      mensaje: '¡Datos actualizados correctamente!',
+      datos: updateUsuarioDto
+    }
   }
 
   // Este método retorna los datos de un usuario sin la contraseña
