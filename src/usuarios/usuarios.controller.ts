@@ -18,8 +18,9 @@ export class UsuariosController {
     return this.usuariosService.createFinanceParams(correo, body);
   }
 
-  @Patch(':correo')
-  update(@Param('correo') correo: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+  @Patch('finance')
+  update(@Req() req: any, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+    const correo = req.usuario.mail;
     return this.usuariosService.createFinanceParams(correo, updateUsuarioDto);
   }
 
@@ -27,5 +28,13 @@ export class UsuariosController {
   getProfile(@Req() req: any) {
     const user = req.usuario; // viene del AuthGuard global
     return this.usuariosService.getInfoUsuario(user.mail);
+  }
+
+  @Patch('security')
+  updatePassw(@Req() req: any, @Body() body: any) {
+    const correo = req.usuario.mail; // Obtiene el correo de la request
+    const currentPassw = body.contrasena; // Obtiene la contraseña actual del body
+    const newPassw = body.nueva_contrasena; // Obtiene la contraseña nueva del body
+    return this.usuariosService.updatePassw(correo, currentPassw, newPassw);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -79,6 +79,30 @@ export class UsuariosService {
     }
   }
 
+  // Método que cambia la contraseña dek usuario, primero verificando la actual
+  async updatePassw(correo: string, passw: string, newPassw: string) {
+    const contraValida = await this.validatePassw(correo, passw);
+
+    if (!contraValida) {
+      throw new UnauthorizedException('La contraseña actual es errónea.');
+    }
+
+    const passwordHash = await this.hashPassw(newPassw);
+
+    await this.prisma.usuario.update({
+      where: {
+        correo
+      },
+      data: {
+        contrasena: passwordHash,
+      }
+    });
+
+    return {
+      mensaje: '¡Contraseña actualizada correctamente!',
+    };
+  }
+
   // Este método retorna los datos de un usuario sin la contraseña
   async getInfoUsuario(correo: string) {
     const usuarioConsultado = await this.findByCorreo(correo);
@@ -90,5 +114,26 @@ export class UsuariosService {
     const { contrasena, ...datosUsuarios } = usuarioConsultado;
 
     return datosUsuarios;
+  }
+
+  // Función que verifica la contraseña actual del usuario
+  async validatePassw(email: string, passw: string): Promise<boolean> {
+    const usuario = await this.findByCorreo(email);
+
+    const password = await bcrypt.compare(passw, usuario?.contrasena);
+
+    if (!password) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // Función que encripta la contraseña
+  async hashPassw(passw: string) {
+    const saltOrRounds = 10;
+    const hash = passw;
+    
+    return await bcrypt.hash(hash, saltOrRounds);
   }
 }
