@@ -8,10 +8,11 @@ import { MailModule } from 'src/mail/mail.module';
 import { VerificationModule } from 'src/verification/verification.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
+import { CategoriasModule } from 'src/categorias/categorias.module';
 
 @Module({
   imports: [MailModule, PrismaModule, VerificationModule,
-    UsuariosModule,
+    UsuariosModule, CategoriasModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' }

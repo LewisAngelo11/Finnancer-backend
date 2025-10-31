@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt'; // Importar bcrypt para hashear la contra del 
 import { MailService } from 'src/mail/mail.service'; // Importar el servicio de Mail
 import { VerificationService } from 'src/verification/verification.service';
 import { JwtService } from '@nestjs/jwt';
+import { CategoriasService } from 'src/categorias/categorias.service';
 
 
 @Injectable()
@@ -15,7 +16,8 @@ export class AuthService {
         private userService: UsuariosService, 
         private mailService: MailService,
         private verificationService: VerificationService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private categoriasService: CategoriasService
     ) {}
     
     // Método para iniciar sesión
@@ -68,6 +70,9 @@ export class AuthService {
         // Crear token directamente sin necesidad de llamar a signIn
         const payload = { sub: newUsuario.id_usuario, mail: newUsuario.correo };
         const access_token = await this.jwtService.signAsync(payload);
+
+        // Crea las categorías por defecto del usuario
+        this.categoriasService.createDefaultCategories(newUsuario.id_usuario);
 
         return {
             mensaje: 'Bienvenido a Finnancer',
