@@ -76,6 +76,7 @@ model subcategoria {
   flujo           flujo_efectivo  @default(efectivo)
   id_categoria    Int?
   categoria       categoria?      @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  transaccion     transaccion[]
 }
 
 model transaccion {
@@ -89,8 +90,10 @@ model transaccion {
   id_categoria      Int?
   id_usuario        Int?
   id_perfil         Int?
+  id_subcategoria   Int?
   categoria         categoria?          @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
   perfil            perfil?             @relation(fields: [id_perfil], references: [id_perfil], onDelete: NoAction, onUpdate: NoAction)
+  subcategoria      subcategoria?       @relation(fields: [id_subcategoria], references: [id_subcategoria], onDelete: NoAction, onUpdate: NoAction)
   usuario           usuario?            @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
   transaccion_cuota transaccion_cuota[]
 }
