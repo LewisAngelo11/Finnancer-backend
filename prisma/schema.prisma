@@ -21,16 +21,17 @@ model balance {
 }
 
 model categoria {
-  id_categoria Int             @id @default(autoincrement())
-  nombre       String          @db.VarChar(50)
-  tipo         tipo_movimiento @default(ingreso)
-  estatus      estatus         @default(activo)
-  flujo        flujo_efectivo  @default(efectivo)
-  id_usuario   Int?
-  usuario      usuario?        @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
-  persona      persona[]
-  subcategoria subcategoria[]
-  transaccion  transaccion[]
+  id_categoria  Int             @id @default(autoincrement())
+  nombre        String          @db.VarChar(50)
+  tipo          tipo_movimiento @default(ingreso)
+  estatus       estatus         @default(activo)
+  flujo         flujo_efectivo  @default(efectivo)
+  id_usuario    Int?
+  mostrar_panel Boolean         @default(true)
+  usuario       usuario?        @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  persona       persona[]
+  subcategoria  subcategoria[]
+  transaccion   transaccion[]
 }
 
 model notificacion {
@@ -50,6 +51,7 @@ model perfil {
   fecha_creacion DateTime       @default(now()) @db.Date
   estatus        estatus        @default(activo)
   id_usuario     Int?
+  pin            String?        @db.VarChar(6)
   notificacion   notificacion[]
   usuario        usuario?       @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
   transaccion    transaccion[]
