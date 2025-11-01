@@ -17,41 +17,93 @@ export class CategoriasService {
 
   // Método que crea las categorias por defecto a el usuario recíen registrado
   async createDefaultCategories(id: number) {
-    // Crea cada categoria por defecto al mismo usuario
-    for (let i = 0; i < this.categoriasDefault.length; i++) {
-      // Asignar el id_usuario a la categoría
-      this.categoriasDefault[i].idUsuario = id;
+    // Crear una copia del array para agregar el id del usuairo que pertenecerán las categorías
+    const categoriasUsuario = this.categoriasDefault.map(categoria => ({
+      ...categoria,
+      idUsuario: id
+    }));
 
-      await this.prisma.categoria.create({
-        data: {
-          nombre: this.categoriasDefault[i].nombre,
-          tipo: this.categoriasDefault[i].tipo,
-          estatus: this.categoriasDefault[i].estatus,
-          flujo: this.categoriasDefault[i].flujo,
-          id_usuario: this.categoriasDefault[i].idUsuario,
-        },
-      });
-    }
+    // Crea las categoria por defecto del usuario en paralelo
+    await Promise.all(
+      categoriasUsuario.map(categoria => 
+        this.prisma.categoria.create({
+          data: {
+            nombre: categoria.nombre,
+            tipo: categoria.tipo,
+            estatus: categoria.estatus,
+            flujo: categoria.flujo,
+            id_usuario: categoria.idUsuario,
+          },
+        }),
+      ),
+    );
   }
 
-  // Método que obtiene todas las categorías del usuario
+  // Método que obtiene todas las categorías del usuario que están activas y no de baja
   getAllCategories(id: number) {
     return this.prisma.categoria.findMany({
       where: {
         id_usuario: id,
+        estatus: 'activo',
       },
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} categoria`;
+  // Método que crea una categoría personalizada del usuario
+  async createCategory(idUsuario: number, createCategoryDto: CreateCategoriaDto) {
+    await this.prisma.categoria.create({
+      data: {
+        nombre: createCategoryDto.nombre,
+        tipo: createCategoryDto.tipo,
+        flujo: createCategoryDto.flujo,
+        id_usuario: idUsuario,
+      }
+    });
+    
+    return {
+      mensaje: '¡Categoría creada!',
+    };
   }
 
-  update(id: number, updateCategoriaDto: UpdateCategoriaDto) {
-    return `This action updates a #${id} categoria`;
+  // Método que actualiza la categoría
+  async updateCategory(idUsuario: number, updateCategoriaDto: UpdateCategoriaDto) {
+    await this.prisma.categoria.update({
+      where: {
+        id_usuario: idUsuario,
+        id_categoria: updateCategoriaDto.idCategoria,
+      },
+      data: {
+        nombre: updateCategoriaDto.nombre,
+        tipo: updateCategoriaDto.tipo,
+        flujo: updateCategoriaDto.flujo,
+      }
+    });
+
+    return {
+      mensaje: '¡Categoría actualizada correctamente!',
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} categoria`;
+  // Método que cambia el estatus de una categoría
+  async changeEstatusCategory(idUsuario: number, updateCategoriaDto: UpdateCategoriaDto) {
+    await this.prisma.categoria.update({
+      where: {
+        id_usuario: idUsuario,
+        id_categoria: updateCategoriaDto.idCategoria
+      },
+      data: {
+        estatus: updateCategoriaDto.estatus
+      }
+    });
+
+    if (updateCategoriaDto.estatus === 'baja') {
+      return {
+        mensaje: 'La categoría fue dada de baja.',
+      };
+    }
+
+    return {
+      mensaje: 'La categoría se habilitó.',
+    };
   }
 }

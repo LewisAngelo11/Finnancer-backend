@@ -1,15 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, Patch } from '@nestjs/common';
 import { CategoriasService } from './categorias.service';
-import { CreateCategoriaDto } from './dto/create-categoria.dto';
-import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
 
+  @Post('new')
+  createCategory(@Req() req: any, @Body() body: any) {
+    const idUsuario = req.usuario.sub;
+    return this.categoriasService.createCategory(idUsuario, body);
+  }
+
   @Get('all')
   getCategories(@Req() req: any) {
-    const idUsuario = req.usuario.id;
+    const idUsuario = req.usuario.sub;
     return this.categoriasService.getAllCategories(idUsuario);
+  }
+
+  @Patch('update')
+  updateCategory(@Req() req: any, @Body() body: any) {
+    const idUsuario = req.usuario.sub;
+    return this.categoriasService.updateCategory(idUsuario, body);
+  }
+
+  @Patch('status')
+  changeEstatus(@Req() req: any, @Body() body: any) {
+    const idUsuario = req.usuario.sub;
+    return this.categoriasService.changeEstatusCategory(idUsuario, body);
   }
 }
