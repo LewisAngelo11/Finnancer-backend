@@ -7,10 +7,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class CategoriasService {
   // Categorías por defecto al crear una nuevo usuario, se les asignan esas categorías por defectos
   private categoriasDefault: CreateCategoriaDto[] = [
-    {nombre: 'Ingresos de Ventas', tipo: 'ingreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0 },
-    {nombre: 'Servicios Básicos', tipo: 'egreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0 },
-    {nombre: 'Otros Ingresos', tipo: 'ingreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0 },
-    {nombre: 'Otros Egresos', tipo: 'egreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0 },
+    { nombre: 'Ingresos de Ventas', tipo: 'ingreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0, mostrarPanel: true},
+    { nombre: 'Servicios Básicos', tipo: 'egreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0, mostrarPanel: true},
+    { nombre: 'Otros Ingresos', tipo: 'ingreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0, mostrarPanel: true},
+    { nombre: 'Otros Egresos', tipo: 'egreso', estatus: 'activo', flujo: 'efectivo', idUsuario: 0, mostrarPanel: true},
   ];
   
   constructor(private prisma: PrismaService) {}
@@ -33,6 +33,7 @@ export class CategoriasService {
             estatus: categoria.estatus,
             flujo: categoria.flujo,
             id_usuario: categoria.idUsuario,
+            mostrar_panel: categoria.mostrarPanel
           },
         }),
       ),
@@ -57,6 +58,7 @@ export class CategoriasService {
         tipo: createCategoryDto.tipo,
         flujo: createCategoryDto.flujo,
         id_usuario: idUsuario,
+        mostrar_panel: createCategoryDto.mostrarPanel
       }
     });
     
@@ -76,6 +78,7 @@ export class CategoriasService {
         nombre: updateCategoriaDto.nombre,
         tipo: updateCategoriaDto.tipo,
         flujo: updateCategoriaDto.flujo,
+        mostrar_panel: updateCategoriaDto.mostrarPanel
       }
     });
 

@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsEnum } from 'class-validator';
+import { IsNumber, IsString, IsEnum, IsBoolean } from 'class-validator';
 import { tipo_movimiento, estatus, flujo_efectivo } from 'generated/prisma';
 
 export class CreateCategoriaDto {
@@ -13,6 +13,9 @@ export class CreateCategoriaDto {
 
     @IsEnum(flujo_efectivo)
     flujo: flujo_efectivo;
+
+    @IsBoolean()
+    mostrarPanel: boolean;
 
     @IsNumber()
     idUsuario: number;
