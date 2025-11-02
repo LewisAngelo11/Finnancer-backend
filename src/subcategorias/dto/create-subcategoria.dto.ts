@@ -16,4 +16,7 @@ export class CreateSubcategoriaDto {
 
     @IsNumber()
     idCategoria: number;
+
+    @IsBoolean()
+    mostrarPanel: boolean;
 }
