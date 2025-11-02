@@ -99,14 +99,10 @@ export class CategoriasService {
       }
     });
 
-    if (updateCategoriaDto.estatus === 'baja') {
-      return {
-        mensaje: 'La categoría fue dada de baja.',
-      };
-    }
-
     return {
-      mensaje: 'La categoría se habilitó.',
+      mensaje: updateCategoriaDto.estatus === 'baja'
+      ? 'La categoría fue dada de baja'
+      : 'La categoría se habilitó'
     };
   }
 }
