@@ -75,6 +75,7 @@ model subcategoria {
   estatus         estatus         @default(activo)
   flujo           flujo_efectivo  @default(efectivo)
   id_categoria    Int?
+  mostrar_panel   Boolean?        @default(true)
   categoria       categoria?      @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
   transaccion     transaccion[]
 }
