@@ -8,9 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 import { VerificationModule } from './verification/verification.module';
 import { PerfilesModule } from './perfiles/perfiles.module';
 import { CategoriasModule } from './categorias/categorias.module';
+import { TransaccionesModule } from './transacciones/transacciones.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UsuariosModule, AuthModule, VerificationModule, PerfilesModule, CategoriasModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UsuariosModule, AuthModule, VerificationModule, PerfilesModule, CategoriasModule, TransaccionesModule],
   controllers: [AppController],
   providers: [AppService],
 })
