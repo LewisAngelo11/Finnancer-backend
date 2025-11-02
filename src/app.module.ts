@@ -9,9 +9,10 @@ import { VerificationModule } from './verification/verification.module';
 import { PerfilesModule } from './perfiles/perfiles.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
+import { SubcategoriasModule } from './subcategorias/subcategorias.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UsuariosModule, AuthModule, VerificationModule, PerfilesModule, CategoriasModule, TransaccionesModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UsuariosModule, AuthModule, VerificationModule, PerfilesModule, CategoriasModule, TransaccionesModule, SubcategoriasModule],
   controllers: [AppController],
   providers: [AppService],
 })
