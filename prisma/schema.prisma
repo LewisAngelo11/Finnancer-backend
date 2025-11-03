@@ -29,7 +29,6 @@ model categoria {
   id_usuario    Int?
   mostrar_panel Boolean         @default(true)
   usuario       usuario?        @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
-  persona       persona[]
   subcategoria  subcategoria[]
   transaccion   transaccion[]
 }
@@ -58,14 +57,14 @@ model perfil {
 }
 
 model persona {
-  id_persona   Int          @id @default(autoincrement())
-  nombre       String       @db.VarChar(100)
-  tipo         tipo_persona @default(cliente)
-  estatus      estatus      @default(activo)
-  id_usuario   Int?
-  id_categoria Int?
-  categoria    categoria?   @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
-  usuario      usuario?     @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  id_persona     Int          @id @default(autoincrement())
+  nombre         String       @db.VarChar(100)
+  tipo           tipo_persona @default(cliente)
+  estatus        estatus      @default(activo)
+  id_usuario     Int?
+  id_transaccion Int?
+  transaccion    transaccion? @relation(fields: [id_transaccion], references: [id_transaccion], onDelete: NoAction, onUpdate: NoAction)
+  usuario        usuario?     @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model subcategoria {
@@ -94,6 +93,7 @@ model transaccion {
   id_usuario        Int?
   id_perfil         Int?
   id_subcategoria   Int?
+  persona           persona[]
   categoria         categoria?          @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
   perfil            perfil?             @relation(fields: [id_perfil], references: [id_perfil], onDelete: NoAction, onUpdate: NoAction)
   subcategoria      subcategoria?       @relation(fields: [id_subcategoria], references: [id_subcategoria], onDelete: NoAction, onUpdate: NoAction)
