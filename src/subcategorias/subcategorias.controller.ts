@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Req } from '@nestjs/common';
 import { SubcategoriasService } from './subcategorias.service';
 import { CreateSubcategoriaDto } from './dto/create-subcategoria.dto';
 import { UpdateSubcategoriaDto } from './dto/update-subcategoria.dto';
@@ -8,7 +8,26 @@ export class SubcategoriasController {
   constructor(private readonly subcategoriasService: SubcategoriasService) {}
 
   @Post('create')
-  createSubcategory(@Body() body: any) {
-    return this.subcategoriasService.createSubcategory(body);
+  createSubcategory(@Req() req: any, @Body() body: CreateSubcategoriaDto) {
+    const idUsuario = req.usuario.sub;
+    return this.subcategoriasService.createSubcategory(idUsuario, body);
+  }
+
+  @Get('all-active')
+  getAllSubcategories(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.subcategoriasService.getAllSubcategories(idUsuario);
+  }
+
+  @Patch('update')
+  updateSubcategory(@Req() req: any, @Body() body: UpdateSubcategoriaDto) {
+    const idUsuario = req.usuario.sub;
+    return this.subcategoriasService.updateSubcategory(idUsuario, body);
+  }
+
+  @Patch('change-status')
+  changeStatusSubcategory(@Req() req: any, @Body() body: UpdateSubcategoriaDto) {
+    const idUsuario = req.usuario.sub;
+    return this.subcategoriasService.changeStatusSubcategory(idUsuario, body);
   }
 }
