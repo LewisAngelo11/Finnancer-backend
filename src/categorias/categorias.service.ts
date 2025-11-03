@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { categoria } from 'generated/prisma';
 
 @Injectable()
 export class CategoriasService {
@@ -69,7 +70,7 @@ export class CategoriasService {
 
   // Método que actualiza la categoría
   async updateCategory(idUsuario: number, updateCategoriaDto: UpdateCategoriaDto) {
-    await this.prisma.categoria.update({
+    const categoria = await this.prisma.categoria.update({
       where: {
         id_usuario: idUsuario,
         id_categoria: updateCategoriaDto.idCategoria,
@@ -82,8 +83,15 @@ export class CategoriasService {
       }
     });
 
+    // Actualizo los atributos de 'flujo' y 'tipo' en las subcategorías pertenecientes a la categoría
+    await Promise.all([
+      this.changeFlujoSubcategory(updateCategoriaDto, categoria),
+      this.changeTipoSubcategory(updateCategoriaDto, categoria),
+    ]);
+
     return {
       mensaje: '¡Categoría actualizada correctamente!',
+      categoria,
     };
   }
 
@@ -104,5 +112,35 @@ export class CategoriasService {
       ? 'La categoría fue dada de baja'
       : 'La categoría se habilitó'
     };
+  }
+
+  // Método que actualiza el 'flujo' de todas las subcategorías que pertenecen a la misma categoría
+  async changeFlujoSubcategory(updateCategoriaDto: UpdateCategoriaDto, categoria: categoria) {
+    if (updateCategoriaDto.flujo && updateCategoriaDto.flujo !== categoria.flujo) {
+      await this.prisma.subcategoria.updateMany({
+        where: {
+          id_categoria: categoria.id_categoria,
+        },
+        data: {
+          flujo: updateCategoriaDto.flujo,
+        }
+      });
+    }
+    return;
+  }
+
+  // Método que actualiza el 'tipo' de todas las subcategorías que pertecenen a la misma categoría
+  async changeTipoSubcategory(updateCategoriaDto: UpdateCategoriaDto, categoria: categoria) {
+    if (updateCategoriaDto.tipo && updateCategoriaDto.tipo !== categoria.tipo) {
+      await this.prisma.subcategoria.updateMany({
+        where: {
+          id_categoria: categoria.id_categoria,
+        },
+        data: {
+          tipo: updateCategoriaDto.tipo,
+        }
+      });
+    }
+    return;
   }
 }
