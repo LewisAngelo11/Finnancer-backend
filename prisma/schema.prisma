@@ -108,6 +108,7 @@ model transaccion_cuota {
   fecha_vencimiento DateTime            @db.Date
   fecha_pago        DateTime?           @db.Date
   estatus           estatus_transaccion @default(pendiente)
+  pagado            Decimal             @default(0) @db.Decimal(14, 2)
   transaccion       transaccion?        @relation(fields: [id_transaccion], references: [id_transaccion], onDelete: NoAction, onUpdate: NoAction)
 }
 
