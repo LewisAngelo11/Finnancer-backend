@@ -5,15 +5,9 @@ export class CreateSubcategoriaDto {
     @IsString()
     nombre: string;
 
-    @IsEnum(tipo_movimiento)
-    tipo: tipo_movimiento;
-
     @IsEnum(estatus)
     estatus: estatus;
-
-    @IsEnum(flujo_efectivo)
-    flujo: flujo_efectivo;
-
+    
     @IsNumber()
     idCategoria: number;
 
