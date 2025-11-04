@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsDate, IsEnum } from 'class-validator';
+import { IsString, IsEnum } from 'class-validator';
 import { tipo_persona, estatus } from 'generated/prisma';
 
 export class CreatePersonaDto {
@@ -10,7 +10,4 @@ export class CreatePersonaDto {
 
     @IsEnum(estatus)
     estatus: estatus;
-
-    @IsNumber()
-    idUsuario: number;
 }
