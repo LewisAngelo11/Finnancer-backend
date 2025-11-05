@@ -11,11 +11,12 @@ import { CategoriasModule } from './categorias/categorias.module';
 import { TransaccionesModule } from './transacciones/transacciones.module';
 import { SubcategoriasModule } from './subcategorias/subcategorias.module';
 import { PersonasModule } from './personas/personas.module';
+import { TransaccionesCuotasModule } from './transacciones-cuotas/transacciones-cuotas.module';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UsuariosModule,
     AuthModule, VerificationModule, PerfilesModule, CategoriasModule, TransaccionesModule,
-    SubcategoriasModule, PersonasModule],
+    SubcategoriasModule, PersonasModule, TransaccionesCuotasModule],
   controllers: [AppController],
   providers: [AppService],
 })
