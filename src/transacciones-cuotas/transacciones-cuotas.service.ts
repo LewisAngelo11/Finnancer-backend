@@ -1,26 +1,102 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTransaccionesCuotaDto } from './dto/create-transacciones-cuota.dto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateTransaccionesCuotaDto } from './dto/update-transacciones-cuota.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { estatus_transaccion } from 'generated/prisma';
+import { Decimal } from 'generated/prisma/runtime/library';
+import { TransaccionesService } from 'src/transacciones/transacciones.service';
 
 @Injectable()
 export class TransaccionesCuotasService {
-  create(createTransaccionesCuotaDto: CreateTransaccionesCuotaDto) {
-    return 'This action adds a new transaccionesCuota';
+  constructor(private prisma: PrismaService, private transacciones: TransaccionesService) {}
+
+  // Método que es para los pagos de las cuotas de una transacción
+  async paymentTransactionFee(cuotaPago: UpdateTransaccionesCuotaDto) {
+    // Obtener la cuota a abonar
+    const cuota = await this.prisma.transaccion_cuota.findUnique({
+      where: {
+        id_cuota: cuotaPago.idCuota,
+      },
+    });
+
+    if (!cuota) throw new NotFoundException('No se encontró la cuota a pagar.');
+    
+    // Saca el restante a pagar restando lo ya pagado a el monto
+    const restante = cuota.monto.sub(cuota.pagado);
+    // Valida si el pago que ingresó el usuario excede el restante
+    if (new Decimal(cuotaPago.pago).greaterThan(restante)) {
+      throw new BadRequestException('El pago excede el monto pendiente de esta cuota.');
+    }
+
+    // Sumarle a lo pagado de la cuota, el nuevo pago hecho por el usuario
+    const nuevoPagado = cuota.pagado.add(cuotaPago.pago);
+
+    let estatusCuota: estatus_transaccion = 'pendiente';
+    let fechaPago: Date | null = null;
+
+    // Verificar si el total pagado es igual al monto, para cambiar el estatus a pagada y crear la fecha de pago
+    if (nuevoPagado.equals(cuota.monto)) {
+      estatusCuota = 'pagada';
+      fechaPago = new Date();
+    }
+
+    // Actualiza la cuota pagada
+    const cuotaPagada = await this.prisma.transaccion_cuota.update({
+      where: {
+        id_cuota: cuotaPago.idCuota
+      },
+      data: {
+        pagado: nuevoPagado,
+        estatus: estatusCuota,
+        fecha_pago: fechaPago,
+      },
+    });
+
+    return {
+      mensaje: 'Se realió el pago correctamente.',
+      cuotaPagada,
+    }
   }
 
-  findAll() {
-    return `This action returns all transaccionesCuotas`;
+  // Método que verifica si la suma de los pagos de las cuotas es igual a el monto total de la transaccion
+  async validatePaymentsFee(idTransaccion: number) {
+    const cuotasTransaccion = await this.prisma.transaccion_cuota.findMany({
+      where : {
+        id_transaccion: idTransaccion
+      },
+    });
+
+    // Suma todos los valores de pagado de cada cuota
+    const sumaMontosCuotas = cuotasTransaccion.reduce((acumulador, cuota) => acumulador.add(cuota.pagado), new Decimal(0));
+
+    // Obtener la transaccion a la que pertenecen las cuotas
+    const transaccion = await this.transacciones.getOneTransaction(idTransaccion);
+
+    if (!transaccion) throw new BadRequestException('No se encontró la transacción.');
+
+    let transaccionEstatus: estatus_transaccion = 'pendiente';
+    // Verificar si la suma de los pagos de todas las cuotas equivalen al monto total de la transaccion
+    if (sumaMontosCuotas.equals(transaccion.monto_total)) {
+      transaccionEstatus = 'pagada'; // Cambia el estatus a pagada si se cumple
+      const cambioEstatusTransaccion = await this.transacciones.changeStatusTransaction(idTransaccion, transaccionEstatus);
+      return cambioEstatusTransaccion;
+    }
+
+    // Calcula el restante de lo que se debe en la transacción
+    const restante = transaccion.monto_total.sub(sumaMontosCuotas);
+
+    return {
+      mensaje: `Restante a pagar: ${restante}`,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaccionesCuota`;
-  }
+  // Método que obtiene todas las cuotas de una transaccion
+  async getAllFeesOfTransaction(idTransaccion: number) {
+    const transaccionesCuotas = await this.prisma.transaccion_cuota.findMany({
+      where: {
+        id_transaccion: idTransaccion 
+      },
+    });
 
-  update(id: number, updateTransaccionesCuotaDto: UpdateTransaccionesCuotaDto) {
-    return `This action updates a #${id} transaccionesCuota`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaccionesCuota`;
+    return transaccionesCuotas;
   }
 }

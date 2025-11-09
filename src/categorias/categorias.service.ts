@@ -42,13 +42,24 @@ export class CategoriasService {
   }
 
   // Método que obtiene todas las categorías del usuario que están activas y no de baja
-  getAllCategories(id: number) {
-    return this.prisma.categoria.findMany({
+  async getAllCategories(id: number) {
+    return await this.prisma.categoria.findMany({
       where: {
         id_usuario: id,
         estatus: 'activo',
       },
     });
+  }
+
+  // Método que consulta una categoría por su ID
+  async getOneCategory(idCategoria: number) {
+    const categoria = await this.prisma.categoria.findUnique({
+      where: {
+        id_categoria: idCategoria,
+      },
+    });
+
+    return categoria;
   }
 
   // Método que crea una categoría personalizada del usuario

@@ -105,7 +105,7 @@ model transaccion_cuota {
   id_cuota          Int                 @id @default(autoincrement())
   id_transaccion    Int?
   monto             Decimal             @db.Decimal(14, 2)
-  fecha_vencimiento DateTime            @db.Date
+  fecha_vencimiento DateTime?           @db.Date
   fecha_pago        DateTime?           @db.Date
   estatus           estatus_transaccion @default(pendiente)
   pagado            Decimal             @default(0) @db.Decimal(14, 2)
