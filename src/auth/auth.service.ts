@@ -8,6 +8,7 @@ import { MailService } from 'src/mail/mail.service'; // Importar el servicio de 
 import { VerificationService } from 'src/verification/verification.service';
 import { JwtService } from '@nestjs/jwt';
 import { CategoriasService } from 'src/categorias/categorias.service';
+import { PerfilesService } from 'src/perfiles/perfiles.service';
 
 
 @Injectable()
@@ -17,7 +18,8 @@ export class AuthService {
         private mailService: MailService,
         private verificationService: VerificationService,
         private jwtService: JwtService,
-        private categoriasService: CategoriasService
+        private categoriasService: CategoriasService,
+        private perfilesService : PerfilesService,
     ) {}
     
     // Método para iniciar sesión
@@ -73,6 +75,8 @@ export class AuthService {
 
         // Crea las categorías por defecto del usuario
         this.categoriasService.createDefaultCategories(newUsuario.id_usuario);
+        // Crea el perfil de administrador al nuevo usuario
+        this.perfilesService.createAdminProfile(newUsuario.id_usuario);
 
         return {
             mensaje: 'Bienvenido a Finnancer',

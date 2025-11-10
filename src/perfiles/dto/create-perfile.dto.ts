@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsDate } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreatePerfileDto {
     @IsString()
@@ -7,6 +7,6 @@ export class CreatePerfileDto {
     @IsNumber()
     icono: number;
 
-    @IsDate()
-    fechaCreacion: Date;
+    @IsString()
+    pin: string;
 }

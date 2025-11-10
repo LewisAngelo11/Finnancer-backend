@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Req } from '@nestjs/common';
 import { PerfilesService } from './perfiles.service';
 import { CreatePerfileDto } from './dto/create-perfile.dto';
 import { UpdatePerfileDto } from './dto/update-perfile.dto';
@@ -7,28 +7,31 @@ import { UpdatePerfileDto } from './dto/update-perfile.dto';
 export class PerfilesController {
   constructor(private readonly perfilesService: PerfilesService) {}
 
-  @Post()
-  create(@Body() createPerfileDto: CreatePerfileDto) {
-    return this.perfilesService.create(createPerfileDto);
+  @Post('create')
+  createProfile(@Req() req: any, @Body() body: CreatePerfileDto){
+    const idUsuario = req.usuario.sub;
+    return this.perfilesService.createProfile(idUsuario, body);
   }
 
-  @Get()
-  findAll() {
-    return this.perfilesService.findAll();
+  @Post('create-admin')
+  createAdminProfile(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.perfilesService.createAdminProfile(idUsuario);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.perfilesService.findOne(+id);
+  @Get('all')
+  getAllProfiles(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.perfilesService.getAllProfiles(idUsuario);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePerfileDto: UpdatePerfileDto) {
-    return this.perfilesService.update(+id, updatePerfileDto);
+  @Patch('disable')
+  disableProfiles(@Body() body: UpdatePerfileDto) {
+    return this.perfilesService.disableProfile(body);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.perfilesService.remove(+id);
+  @Patch('enable')
+  enableProfiles(@Body() body: UpdatePerfileDto) {
+    return this.perfilesService.enableProfile(body);
   }
 }
