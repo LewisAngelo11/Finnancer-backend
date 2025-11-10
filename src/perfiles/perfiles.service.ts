@@ -53,6 +53,28 @@ export class PerfilesService {
         return perfiles;
     }
 
+    // Método que retorna únicamente los perfiles activos
+    async getAllActiveProfiles(idUsuario: number) {
+        const perfiles = await this.prisma.perfil.findMany({
+            where: {
+                id_usuario: idUsuario,
+                estatus: 'activo',
+            },
+        });
+
+        return perfiles;
+    }
+
+    // Función que retorna un perfil por su ID
+    async getOneProfile(idPerfil: number) {
+        const perfil = await this.prisma.perfil.findUnique({
+            where: {
+                id_perfil: idPerfil,
+            },
+        });
+
+        return perfil;
+    }
     // Método que da de baja un perfil del usuario
     async disableProfile(updatePerfilDto: UpdatePerfileDto) {
         await this.prisma.perfil.update({
@@ -83,6 +105,6 @@ export class PerfilesService {
         return {
             mensaje: 'El perfil se habilitó.',
             perfil,
-        }
+        };
     }
 }

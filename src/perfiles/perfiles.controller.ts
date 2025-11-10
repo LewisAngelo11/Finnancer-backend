@@ -25,6 +25,17 @@ export class PerfilesController {
     return this.perfilesService.getAllProfiles(idUsuario);
   }
 
+  @Get('all-active')
+  getAllActiveProfiles(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.perfilesService.getAllActiveProfiles(idUsuario);
+  }
+
+  @Get('get-one')
+  getOneProfile(@Req() req: any) {
+    const idPerfil = req.usuario.sub;
+  }
+
   @Patch('disable')
   disableProfiles(@Body() body: UpdatePerfileDto) {
     return this.perfilesService.disableProfile(body);
