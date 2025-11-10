@@ -51,6 +51,7 @@ model perfil {
   estatus        estatus        @default(activo)
   id_usuario     Int?
   pin            String?        @db.VarChar(6)
+  super_usuario  Boolean?       @default(false)
   notificacion   notificacion[]
   usuario        usuario?       @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
   transaccion    transaccion[]
