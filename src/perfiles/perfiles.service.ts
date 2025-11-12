@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePerfileDto } from './dto/create-perfile.dto';
 import { UpdatePerfileDto } from './dto/update-perfile.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PerfilesService {
@@ -10,13 +11,36 @@ export class PerfilesService {
     // Función que crea un nuevo perfil
     async createProfile(idUsuario: number, createProfileDto: CreatePerfileDto) {
         const fechaActual = new Date()
+        const pinHash = await this.hashPin(createProfileDto.pin);
+
         const perfil = await this.prisma.perfil.create({
             data: {
                 nombre: createProfileDto.nombre,
                 icono: createProfileDto.icono,
                 fecha_creacion: fechaActual,
-                pin: createProfileDto.pin,
+                pin: pinHash,
                 id_usuario: idUsuario,
+            },
+        });
+
+        return perfil;
+    }
+
+    async updateProfile(idUsuario: number, updatePerfilDto: UpdatePerfileDto) {
+        let pinHash: any;
+        if (updatePerfilDto.pin) {
+            pinHash = await this.hashPin(updatePerfilDto.pin);
+        }
+        const perfil = await this.prisma.perfil.update({
+            where: {
+                id_usuario: idUsuario,
+                id_perfil: updatePerfilDto.idPerfil
+            },
+            data: {
+                nombre: updatePerfilDto.nombre,
+                icono: updatePerfilDto.icono,
+                pin: pinHash,
+                estatus: updatePerfilDto.estatus,
             },
         });
 
@@ -36,6 +60,7 @@ export class PerfilesService {
                 icono: iconoPerfil,
                 fecha_creacion: fechaActual,
                 id_usuario: idUsuario,
+                super_usuario: true,
             },
         });
 
@@ -48,6 +73,9 @@ export class PerfilesService {
             where: {
                 id_usuario: idUsuario,
             },
+            orderBy: {
+                id_perfil: 'asc'
+            }
         });
 
         return perfiles;
@@ -60,6 +88,9 @@ export class PerfilesService {
                 id_usuario: idUsuario,
                 estatus: 'activo',
             },
+            orderBy: {
+                id_perfil: 'asc'
+            }
         });
 
         return perfiles;
@@ -75,36 +106,12 @@ export class PerfilesService {
 
         return perfil;
     }
-    // Método que da de baja un perfil del usuario
-    async disableProfile(updatePerfilDto: UpdatePerfileDto) {
-        await this.prisma.perfil.update({
-            where: {
-                id_perfil: updatePerfilDto.idPerfil,
-            },
-            data: {
-                estatus: 'baja',
-            },
-        });
 
-        return {
-            mensaje: 'El perfil fue dado de baja.',
-        };
-    }
-
-    // Método que habilita un perfil del usuario
-    async enableProfile(updatePerfilDto: UpdatePerfileDto) {
-        const perfil = await this.prisma.perfil.update({
-            where: {
-                id_perfil: updatePerfilDto.idPerfil,
-            },
-            data: {
-                estatus: 'activo',
-            },
-        });
-
-        return {
-            mensaje: 'El perfil se habilitó.',
-            perfil,
-        };
+    // Función que encripta el pin de acceso del perfil
+    async hashPin(pin: string) {
+        const saltOrRounds = 10;
+        const hash = pin;
+        
+        return await bcrypt.hash(hash, saltOrRounds);
     }
 }
