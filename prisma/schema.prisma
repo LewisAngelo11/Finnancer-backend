@@ -50,7 +50,7 @@ model perfil {
   fecha_creacion DateTime       @default(now()) @db.Date
   estatus        estatus        @default(activo)
   id_usuario     Int?
-  pin            String?        @db.VarChar(6)
+  pin            String?        @db.VarChar(100)
   super_usuario  Boolean?       @default(false)
   notificacion   notificacion[]
   usuario        usuario?       @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
