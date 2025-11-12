@@ -31,18 +31,15 @@ export class PerfilesController {
     return this.perfilesService.getAllActiveProfiles(idUsuario);
   }
 
-  @Get('get-one')
+  @Get('one')
   getOneProfile(@Req() req: any) {
-    const idPerfil = req.usuario.sub;
+    const idPerfil = Number(req.headers['x-perfil-id']); // Acceder al id del perfil en el header de la request
+    return this.perfilesService.getOneProfile(idPerfil);
   }
 
-  @Patch('disable')
-  disableProfiles(@Body() body: UpdatePerfileDto) {
-    return this.perfilesService.disableProfile(body);
-  }
-
-  @Patch('enable')
-  enableProfiles(@Body() body: UpdatePerfileDto) {
-    return this.perfilesService.enableProfile(body);
+  @Patch('update')
+  updateProfile(@Req() req: any, @Body() body: UpdatePerfileDto) {
+    const idUsuario = req.usuario.sub;
+    return this.updateProfile(idUsuario, body);
   }
 }
