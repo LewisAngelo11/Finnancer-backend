@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreatePerfileDto } from './dto/create-perfile.dto';
 import { UpdatePerfileDto } from './dto/update-perfile.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -26,7 +26,7 @@ export class PerfilesService {
         return perfil;
     }
 
-    async updateProfile(idUsuario: number, updatePerfilDto: UpdatePerfileDto) {
+    async updateProfile(idUsuario: number, idPerfil: number, updatePerfilDto: UpdatePerfileDto) {
         let pinHash: any;
         if (updatePerfilDto.pin) {
             pinHash = await this.hashPin(updatePerfilDto.pin);
@@ -34,7 +34,7 @@ export class PerfilesService {
         const perfil = await this.prisma.perfil.update({
             where: {
                 id_usuario: idUsuario,
-                id_perfil: updatePerfilDto.idPerfil
+                id_perfil: idPerfil,
             },
             data: {
                 nombre: updatePerfilDto.nombre,
@@ -113,5 +113,22 @@ export class PerfilesService {
         const hash = pin;
         
         return await bcrypt.hash(hash, saltOrRounds);
+    }
+
+    // Método que valida el pin del perfil
+    async validatePinProfile(updatePerfilDto: UpdatePerfileDto) {
+        const perfil = await this.getOneProfile(updatePerfilDto.idPerfil);
+
+        if (!perfil) {
+            throw new Error('El perfil no fue encontrado');
+        }
+
+        const pinHashed = await bcrypt.compare(updatePerfilDto.pin, perfil.pin);
+
+        if (!pinHashed) {
+            throw new UnauthorizedException('El PIN proporcionado no es correcto.');
+        }
+
+        return true;
     }
 }

@@ -40,6 +40,12 @@ export class PerfilesController {
   @Patch('update')
   updateProfile(@Req() req: any, @Body() body: UpdatePerfileDto) {
     const idUsuario = req.usuario.sub;
-    return this.updateProfile(idUsuario, body);
+    const idPerfil = Number(req.headers['x-perfil-id']);
+    return this.perfilesService.updateProfile(idUsuario, idPerfil, body);
+  }
+
+  @Post('validatePIN')
+  validatePinProfile(@Body() body: UpdatePerfileDto) {
+    return this.perfilesService.validatePinProfile(body);
   }
 }
