@@ -28,6 +28,7 @@ model categoria {
   flujo         flujo_efectivo  @default(efectivo)
   id_usuario    Int?
   mostrar_panel Boolean         @default(true)
+  icono         Int             @default(1)
   usuario       usuario?        @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
   subcategoria  subcategoria[]
   transaccion   transaccion[]
@@ -76,6 +77,7 @@ model subcategoria {
   id_categoria    Int?
   mostrar_panel   Boolean?        @default(true)
   id_usuario      Int?
+  icono           Int             @default(1)
   categoria       categoria?      @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
   usuario         usuario?        @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
   transaccion     transaccion[]
