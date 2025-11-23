@@ -1,5 +1,5 @@
 import { IsNumber, IsString, IsEnum, IsBoolean } from 'class-validator';
-import { tipo_movimiento, estatus, flujo_efectivo } from 'generated/prisma';
+import { estatus } from 'generated/prisma';
 
 export class CreateSubcategoriaDto {
     @IsString()
@@ -13,4 +13,7 @@ export class CreateSubcategoriaDto {
 
     @IsBoolean()
     mostrarPanel: boolean;
+
+    @IsNumber()
+    icono: number;
 }

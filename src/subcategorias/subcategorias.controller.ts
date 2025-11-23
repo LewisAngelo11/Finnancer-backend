@@ -13,7 +13,7 @@ export class SubcategoriasController {
     return this.subcategoriasService.createSubcategory(idUsuario, body);
   }
 
-  @Get('all-active')
+  @Get('all')
   getAllSubcategories(@Req() req: any) {
     const idUsuario = req.usuario.sub;
     return this.subcategoriasService.getAllSubcategories(idUsuario);

@@ -19,4 +19,7 @@ export class CreateCategoriaDto {
 
     @IsNumber()
     idUsuario: number;
+
+    @IsNumber()
+    icono: number;
 }

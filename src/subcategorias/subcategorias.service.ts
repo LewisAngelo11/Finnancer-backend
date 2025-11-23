@@ -30,6 +30,7 @@ export class SubcategoriasService {
                 flujo: categoriaPrincipal?.flujo, // Hereda el 'flujo' de la categoría prinicpal a la subcategoria
                 id_categoria: createSubcategoriaDto.idCategoria,
                 mostrar_panel: createSubcategoriaDto.mostrarPanel,
+                icono: createSubcategoriaDto.icono,
                 id_usuario: idUsuario
             },
         });
@@ -45,7 +46,6 @@ export class SubcategoriasService {
         return this.prisma.subcategoria.findMany({
             where: {
                 id_usuario: idUsuario,
-                estatus: 'activo'
             },
         });
     }
