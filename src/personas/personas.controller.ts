@@ -13,6 +13,12 @@ export class PersonasController {
     return this.personasService.createPerson(idUsuario ,body);
   }
 
+  @Get('all')
+  getAll(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.personasService.getAllPersons(idUsuario);
+  }
+
   @Get('clients')
   getAllClients(@Req() req: any) {
     const idUsuario = req.usuario.sub;
@@ -29,6 +35,12 @@ export class PersonasController {
   updatePerson(@Req() req: any, @Body() body: UpdatePersonaDto) {
     const idUsuario = req.usuario.sub;
     return this.personasService.updatePerson(idUsuario, body);
+  }
+
+  @Post('debt')
+  getAllDebt(@Body() body: UpdatePersonaDto) {
+    const idPersona = body.idPersona;
+    return this.personasService.getAllDebt(idPersona);
   }
 
   @Patch('status')

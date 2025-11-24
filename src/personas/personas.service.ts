@@ -25,6 +25,17 @@ export class PersonasService {
     };
   }
 
+  // Método que retorna todos los clientes y proveedores
+  async getAllPersons(idusuario: number) {
+    const persons = await this.prisma.persona.findMany({
+      where: {
+        id_usuario: idusuario,
+      },
+    });
+
+    return persons;
+  }
+
   // Método que obtiene todos los clientes del usuario
   async getClients(idUsuario: number) {
     return await this.prisma.persona.findMany({
@@ -64,6 +75,21 @@ export class PersonasService {
       : '¡Proveedor creado correctamente!',
       persona,
     };
+  }
+
+  // Método que obtiene toda la deuda pendiente de un cliente o proveedor
+  async getAllDebt(idPersona: number) {
+    const deudaTotal = await this.prisma.transaccion.aggregate({
+      where: {
+        id_persona: idPersona,
+        estatus: 'pendiente'
+      },
+      _sum: {
+        monto_total: true,
+      },
+    });
+
+    return deudaTotal._sum.monto_total?.toNumber() ?? 0;
   }
 
   // Método que cambia el estatus de una persona (Cliente o Proveedor)
