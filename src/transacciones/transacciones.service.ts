@@ -16,7 +16,7 @@ export class TransaccionesService {
   constructor(private prisma: PrismaService, private categoria: CategoriasService) {}
 
   // Método que crea una nueva transaccion
-  async createNewTransaction(idUsuario: number, createTransaccioneDto: CreateTransaccioneDto) {
+  async createNewTransaction(idUsuario: number, idPerfil: number, createTransaccioneDto: CreateTransaccioneDto) {
     // Consultar la categoria a la que pertenece la transaccion y verificar que flujo de efectivo tiene
     let categoria = await this.categoria.getOneCategory(createTransaccioneDto.idCategoria);
 
@@ -32,7 +32,7 @@ export class TransaccionesService {
         plazos: createTransaccioneDto.plazos,
         id_categoria: createTransaccioneDto.idCategoria,
         id_usuario: idUsuario,
-        id_perfil: createTransaccioneDto.idPerfil,
+        id_perfil: idPerfil,
         id_subcategoria: createTransaccioneDto.idSubcategoria,
         id_persona: createTransaccioneDto.idPersona,
       }
@@ -59,6 +59,44 @@ export class TransaccionesService {
       transaccion,
       cuotas,
     }
+  }
+
+  // Método que obtiene todas las transacciones del usuario
+  async getAllTransactions(idUsuaio: number) {
+    const transacciones = await this.prisma.transaccion.findMany({
+      where: {
+        id_usuario: idUsuaio,
+      },
+      include: {
+        categoria: {
+          select: { nombre: true }
+        },
+        subcategoria: {
+          select: { nombre: true }
+        },
+        persona: {
+          select: { nombre: true }
+        },
+        perfil: {
+          select: { nombre: true }
+        }
+    }
+    });
+
+    // Devuelve la respuesta mas limpia para el frontend
+    return transacciones.map(t => ({
+      id_transaccion: t.id_transaccion,
+      tipo: t.tipo,
+      fecha_transaccion: t.fecha_transaccion,
+      nota: t.nota,
+      monto_total: t.monto_total,
+      plazos: t.plazos,
+      estatus: t.estatus,
+      categoria: t.categoria?.nombre || 'Sin categoría',
+      subcategoria: t.subcategoria?.nombre || 'Sin Subcategoría',
+      persona: t.persona?.nombre || 'Ninguno',
+      perfil: t.perfil?.nombre || 'Ninguno',
+    }));
   }
 
   // Método que obtienen todas las transaciones que son de ingresos
@@ -123,5 +161,20 @@ export class TransaccionesService {
       mensaje: 'La transacción ha sido pagada.',
       transaccion,
     };
+  }
+
+  // Función que obtiene todo el monto de ingresos de las transacciones
+  async getAllIncomesAmount(idUsuario: number) {
+    const ingresosTotales = await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        tipo: 'ingreso'
+      },
+      _sum: {
+        monto_total: true,
+      },
+    });
+
+    return ingresosTotales;
   }
 }

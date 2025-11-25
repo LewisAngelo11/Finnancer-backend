@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, ParseIntPipe } from '@nestjs/common';
 import { TransaccionesService } from './transacciones.service';
 import { CreateTransaccioneDto } from './dto/create-transaccione.dto';
 import { UpdateTransaccioneDto } from './dto/update-transaccione.dto';
@@ -10,7 +10,19 @@ export class TransaccionesController {
   @Post('create')
   createNewTransaction(@Req() req: any, @Body() body: CreateTransaccioneDto) {
     const idUsuario = req.usuario.sub;
-    return this.transaccionesService.createNewTransaction(idUsuario, body);
+    const idPerfil = Number(req.headers['x-perfil-id']);
+    return this.transaccionesService.createNewTransaction(idUsuario, idPerfil, body);
+  }
+
+  @Get('all')
+  getAllTransactions(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.getAllTransactions(idUsuario);
+  }
+
+  @Get(':idTransaction')
+  getOneTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
+    return this.transaccionesService.getOneTransaction(idTransaction);
   }
 
   @Get('incomes')
