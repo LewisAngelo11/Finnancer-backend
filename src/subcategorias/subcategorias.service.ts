@@ -50,6 +50,17 @@ export class SubcategoriasService {
         });
     }
 
+    // Método que obtiene toas las subcategorías pertenecientes a una categoría
+    async getSubcategoriesFromCategory(idCategoria: number) {
+        const allSubcategories = await this.prisma.subcategoria.findMany({
+            where: {
+                id_categoria: idCategoria,
+            },
+        });
+
+        return allSubcategories;
+    }
+
     // Método para actualizar los datos de la subcategoría
     async updateSubcategory(idUsuario: number, updateSubcategoriaDto: UpdateSubcategoriaDto) {
         const subcategoria = await this.prisma.subcategoria.update({

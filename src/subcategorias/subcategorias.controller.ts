@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Req, Param, ParseIntPipe } from '@nestjs/common';
 import { SubcategoriasService } from './subcategorias.service';
 import { CreateSubcategoriaDto } from './dto/create-subcategoria.dto';
 import { UpdateSubcategoriaDto } from './dto/update-subcategoria.dto';
@@ -17,6 +17,11 @@ export class SubcategoriasController {
   getAllSubcategories(@Req() req: any) {
     const idUsuario = req.usuario.sub;
     return this.subcategoriasService.getAllSubcategories(idUsuario);
+  }
+
+  @Get(':idCategoria')
+  getAllSubcategoriesFromCategory(@Param('idCategoria', ParseIntPipe) idCategoria: number) {
+    return this.subcategoriasService.getSubcategoriesFromCategory(idCategoria);
   }
 
   @Patch('update')
