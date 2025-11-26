@@ -20,17 +20,35 @@ export class TransaccionesController {
     return this.transaccionesService.getAllTransactions(idUsuario);
   }
 
+  @Get('last-transactions')
+  getLastTransactions(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.getLastTransactions(idUsuario);
+  }
+
   @Get(':idTransaction')
   getOneTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
     return this.transaccionesService.getOneTransaction(idTransaction);
   }
 
+  @Get('amount/incomes')
+  getAllIncomesAmount(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.getAllIncomesAmount(idUsuario);
+  }
+
+  @Get('amount/espenses')
+  getAllEspensesAmount(@Req() req: any) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.getAllEspensesAmount(idUsuario);
+  }
+  
   @Get('incomes')
   getIncomesTransaction(@Req() req: any) {
     const idUsuario = req.usuario.sub;
     return this.transaccionesService.getIncomesTransactions(idUsuario);
   }
-
+  
   @Get('expenses')
   getExpensesTransaction(@Req() req: any) {
     const idUsuario = req.usuario.sub;
@@ -41,5 +59,10 @@ export class TransaccionesController {
   cancelTransaction(@Req() req: any, @Body() body: UpdateTransaccioneDto) {
     const idUsuario = req.usuario.sub;
     return this.transaccionesService.cancelTransaction(idUsuario, body);
+  }
+
+  @Patch('update')
+  updateTransaction(@Body() body: UpdateTransaccioneDto) {
+    return this.transaccionesService.updateTransaction(body);
   }
 }

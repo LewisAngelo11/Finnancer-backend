@@ -3,7 +3,7 @@ import { CreateTransaccioneDto } from './dto/create-transaccione.dto';
 import { UpdateTransaccioneDto } from './dto/update-transaccione.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CategoriasService } from 'src/categorias/categorias.service';
-import { estatus_transaccion } from 'generated/prisma';
+import { estatus_transaccion, flujo_efectivo } from 'generated/prisma';
 
 export interface CuotasData {
   id_transaccion: number;
@@ -62,10 +62,10 @@ export class TransaccionesService {
   }
 
   // Método que obtiene todas las transacciones del usuario
-  async getAllTransactions(idUsuaio: number) {
+  async getAllTransactions(idUsuario: number) {
     const transacciones = await this.prisma.transaccion.findMany({
       where: {
-        id_usuario: idUsuaio,
+        id_usuario: idUsuario,
       },
       include: {
         categoria: {
@@ -80,7 +80,7 @@ export class TransaccionesService {
         perfil: {
           select: { nombre: true }
         }
-    }
+      }
     });
 
     // Devuelve la respuesta mas limpia para el frontend
@@ -100,10 +100,10 @@ export class TransaccionesService {
   }
 
   // Método que obtienen todas las transaciones que son de ingresos
-  async getIncomesTransactions(idUsuaio: number) {
+  async getIncomesTransactions(idUsuario: number) {
     return await this.prisma.transaccion.findMany({
       where: {
-        id_usuario: idUsuaio,
+        id_usuario: idUsuario,
         tipo: 'ingreso',
       }
     });
@@ -125,15 +125,53 @@ export class TransaccionesService {
       where: {
         id_transaccion: idTransaccion,
       },
+      include: {
+        categoria: {
+          select: { flujo: true },
+        },
+      },
     });
+  }
+
+  // Método que obtiene las últimas 10 transacciones mas recientes
+  async getLastTransactions(idUsuario: number) {
+    const lastTransactions = await this.prisma.transaccion.findMany({
+      where: {
+        id_usuario: idUsuario,
+      },
+      orderBy: {
+        fecha_transaccion: 'desc',
+      },
+      take: 10,
+      include: {
+        categoria: {
+          select: {icono: true, nombre: true},
+        },
+      }
+    });
+
+    // Retornar las transacciones mas limpias
+    return lastTransactions.map(t => ({
+      id_transaccion: t.id_transaccion,
+      tipo: t.tipo,
+      fecha_transaccion: t.fecha_transaccion,
+      nota: t.nota,
+      monto_total: t.monto_total,
+      plazos: t.plazos,
+      estatus: t.estatus,
+      categoria: t.categoria?.nombre || '',
+      icono_categoria: t.categoria?.icono || '',
+      id_persona: t.id_persona,
+      perfil: t.id_perfil,
+    }));
   }
 
   // Método que cambia el estatus de la transacción a cancelada.
   async cancelTransaction(idUsuario: number, updateTransaccioneDto: UpdateTransaccioneDto) {
     const transaccion = await this.prisma.transaccion.update({
       where: {
-        id_transaccion: updateTransaccioneDto.idTransaccion,
-        id_usuario: idUsuario,
+        id_transaccion: Number(updateTransaccioneDto.idTransaccion),
+        id_usuario: Number(idUsuario),
       },
       data: {
         estatus: 'cancelada',
@@ -176,5 +214,36 @@ export class TransaccionesService {
     });
 
     return ingresosTotales;
+  }
+
+  // Función que obtiene todo el monto de egresos de las transacciones
+  async getAllEspensesAmount(idUsuario: number) {
+    const egresosTotales = await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        tipo: 'egreso'
+      },
+      _sum: {
+        monto_total: true,
+      },
+    });
+
+    return egresosTotales;
+  }
+
+  // Función que actualiza ua transacción (Por lo pronto, actualiza únicamente la nota)
+  async updateTransaction(updateTransaccioneDto: UpdateTransaccioneDto) {
+    const idTransaccion = updateTransaccioneDto.idTransaccion;
+
+    const transaccionUpdate = await this.prisma.transaccion.update({
+      where: {
+        id_transaccion: idTransaccion,
+      },
+      data: {
+        nota: updateTransaccioneDto.nota,
+      },
+    });
+
+    return transaccionUpdate;
   }
 }
