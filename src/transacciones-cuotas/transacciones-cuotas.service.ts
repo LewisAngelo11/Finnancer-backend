@@ -95,6 +95,9 @@ export class TransaccionesCuotasService {
       where: {
         id_transaccion: idTransaccion 
       },
+      orderBy: {
+        id_cuota: 'asc',
+      },
     });
 
     return transaccionesCuotas;

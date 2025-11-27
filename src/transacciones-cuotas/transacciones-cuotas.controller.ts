@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, ParseIntPipe } from '@nestjs/common';
 import { TransaccionesCuotasService } from './transacciones-cuotas.service';
 import { UpdateTransaccionesCuotaDto } from './dto/update-transacciones-cuota.dto';
 
@@ -17,8 +17,8 @@ export class TransaccionesCuotasController {
     return this.transaccionesCuotasService.validatePaymentsFee(idTransaccion);
   }
 
-  @Get(':id')
-  getAllFeesOfTransaction(@Param('idTransaction') idTransaction: number) {
+  @Get(':idTransaction')
+  getAllFeesOfTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
     return this.transaccionesCuotasService.getAllFeesOfTransaction(idTransaction);
   }
 }
