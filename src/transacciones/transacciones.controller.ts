@@ -61,6 +61,12 @@ export class TransaccionesController {
     return this.transaccionesService.cancelTransaction(idUsuario, body);
   }
 
+  @Patch('complete')
+  changeStatusTransaction(@Body() body: UpdateTransaccioneDto) {
+    const idTransaccion = body.idTransaccion;
+    return this.transaccionesService.changeStatusTransaction(idTransaccion);
+  }
+
   @Patch('update')
   updateTransaction(@Body() body: UpdateTransaccioneDto) {
     return this.transaccionesService.updateTransaction(body);

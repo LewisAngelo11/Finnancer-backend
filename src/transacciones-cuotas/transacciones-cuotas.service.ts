@@ -50,9 +50,12 @@ export class TransaccionesCuotasService {
         fecha_pago: fechaPago,
       },
     });
+    
+    // Validar si ya se pagaron todas las cuotas para cambiar el estatus de la transacción
+    await this.validatePaymentsFee(cuotaPago.idTransaccion);
 
     return {
-      mensaje: 'Se realió el pago correctamente.',
+      mensaje: 'Se realizó el pago correctamente.',
       cuotaPagada,
     }
   }
@@ -73,11 +76,10 @@ export class TransaccionesCuotasService {
 
     if (!transaccion) throw new BadRequestException('No se encontró la transacción.');
 
-    let transaccionEstatus: estatus_transaccion = 'pendiente';
     // Verificar si la suma de los pagos de todas las cuotas equivalen al monto total de la transaccion
     if (sumaMontosCuotas.equals(transaccion.monto_total)) {
-      transaccionEstatus = 'pagada'; // Cambia el estatus a pagada si se cumple
-      const cambioEstatusTransaccion = await this.transacciones.changeStatusTransaction(idTransaccion, transaccionEstatus);
+      // Cambia el estatus a pagada si se cumple
+      const cambioEstatusTransaccion = await this.transacciones.changeStatusTransaction(idTransaccion);
       return cambioEstatusTransaccion;
     }
 
@@ -101,5 +103,25 @@ export class TransaccionesCuotasService {
     });
 
     return transaccionesCuotas;
+  }
+
+  // Método que actualiza la fecha de vencimiento de la cuota
+  async updateExpirationDate(body: UpdateTransaccionesCuotaDto) {
+    const idCuota = body.idCuota;
+
+    if (!idCuota) throw new BadRequestException('No se encontró la cuota.');
+
+    await this.prisma.transaccion_cuota.update({
+      where: {
+        id_cuota: idCuota,
+      },
+      data: {
+        fecha_vencimiento: body.fechaVencimiento,
+      },
+    });
+
+    return {
+      mensaje: '¡Fecha de vencimiento agregada!',
+    };
   }
 }

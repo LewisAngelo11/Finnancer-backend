@@ -1,5 +1,5 @@
 import { IsNumber, IsString, IsDate, IsEnum } from 'class-validator';
-import { tipo_movimiento, estatus } from 'generated/prisma';
+import { tipo_movimiento, estatus_transaccion } from 'generated/prisma';
 
 export class CreateTransaccioneDto {
     @IsEnum(tipo_movimiento)
@@ -17,8 +17,8 @@ export class CreateTransaccioneDto {
     @IsNumber()
     plazos: number;
 
-    @IsEnum(estatus)
-    estatus: estatus;
+    @IsEnum(estatus_transaccion)
+    estatus: estatus_transaccion;
 
     @IsNumber()
     idCategoria: number;

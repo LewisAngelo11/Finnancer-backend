@@ -21,4 +21,9 @@ export class TransaccionesCuotasController {
   getAllFeesOfTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
     return this.transaccionesCuotasService.getAllFeesOfTransaction(idTransaction);
   }
+
+  @Patch('updateExpiration')
+  updateExpirationDate(@Body() body: UpdateTransaccionesCuotaDto) {
+    return this.transaccionesCuotasService.updateExpirationDate(body);
+  }
 }

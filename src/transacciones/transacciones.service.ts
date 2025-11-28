@@ -3,7 +3,6 @@ import { CreateTransaccioneDto } from './dto/create-transaccione.dto';
 import { UpdateTransaccioneDto } from './dto/update-transaccione.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CategoriasService } from 'src/categorias/categorias.service';
-import { estatus_transaccion, flujo_efectivo } from 'generated/prisma';
 
 export interface CuotasData {
   id_transaccion: number;
@@ -185,13 +184,13 @@ export class TransaccionesService {
   }
 
   // Método que cambia e estatus de la transaccion a pagada
-  async changeStatusTransaction(idTransaccion: number, newEstatus: estatus_transaccion) {
+  async changeStatusTransaction(idTransaccion: number) {
     const transaccion = await this.prisma.transaccion.update({
       where: {
-        id_transaccion: idTransaccion,
+        id_transaccion: Number(idTransaccion),
       },
       data: {
-        estatus: newEstatus,
+        estatus: 'pagada',
       },
     });
 
