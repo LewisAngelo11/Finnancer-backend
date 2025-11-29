@@ -65,14 +65,13 @@ export class PersonasService {
       },
       data: {
         nombre: updatePersonaDto.nombre,
-        tipo: updatePersonaDto.tipoPersona,
       },
     });
 
     return {
       mensaje: updatePersonaDto.tipoPersona === 'cliente'
-      ? '¡Cliente creado correctamente!'
-      : '¡Proveedor creado correctamente!',
+      ? '¡Cliente actualizado correctamente!'
+      : '¡Proveedor actualizado correctamente!',
       persona,
     };
   }
@@ -106,8 +105,8 @@ export class PersonasService {
 
     return {
       mensaje: updatePersonaDto.tipoPersona === 'cliente'
-      ? '¡Cliente creado correctamente!'
-      : '¡Proveedor creado correctamente!',
+      ? '¡Cliente actualizado correctamente!'
+      : '¡Proveedor actualizado correctamente!',
       persona,
     };
   }
