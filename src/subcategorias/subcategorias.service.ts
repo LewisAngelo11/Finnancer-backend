@@ -43,11 +43,28 @@ export class SubcategoriasService {
 
     // Método que devuelve todas las subcategorias activas del usuario
     async getAllSubcategories(idUsuario: number) {
-        return this.prisma.subcategoria.findMany({
+        const subcategorias = await this.prisma.subcategoria.findMany({
             where: {
                 id_usuario: idUsuario,
             },
+            include: {
+                categoria: {
+                    select: {nombre: true},
+                },
+            },
         });
+
+        return subcategorias.map(s => ({
+            id_subcategoria: s.id_subcategoria,
+            nombre: s.nombre,
+            tipo: s.tipo,
+            estatus: s.estatus,
+            flujo: s.flujo,
+            categoria: s.categoria?.nombre,
+            mostrar_panel: s.mostrar_panel,
+            id_usuario: s.id_usuario,
+            icono: s.icono,
+        }));
     }
 
     // Método que obtiene toas las subcategorías pertenecientes a una categoría
@@ -70,12 +87,13 @@ export class SubcategoriasService {
             },
             data: {
                 nombre: updateSubcategoriaDto.nombre,
+                icono: updateSubcategoriaDto.icono,
                 mostrar_panel: updateSubcategoriaDto.mostrarPanel,
             },
         });
 
         return {
-            mensaje: '¡Subcateogiría actualizada correctamente!',
+            mensaje: '¡Subcategoría actualizada correctamente!',
             subcategoria,
         };
     }

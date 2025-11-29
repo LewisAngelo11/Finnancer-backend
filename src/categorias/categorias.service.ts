@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -110,6 +110,12 @@ export class CategoriasService {
 
   // Método que cambia el estatus de una categoría
   async changeEstatusCategory(idUsuario: number, updateCategoriaDto: UpdateCategoriaDto) {
+    const subcategoriasRows = await this.countSubcateogriesOfCategory(updateCategoriaDto.idCategoria);
+
+    if (subcategoriasRows > 0  && updateCategoriaDto.estatus === 'baja') {
+      throw new BadRequestException('Error: La cateogoría tiene subcategorías activas.');
+    }
+
     await this.prisma.categoria.update({
       where: {
         id_usuario: idUsuario,
@@ -155,5 +161,15 @@ export class CategoriasService {
       });
     }
     return;
+  }
+
+  // Función que retorna el número de subcategorías pertenecientes a una cateogría
+  async countSubcateogriesOfCategory(idCategoria: number): Promise<number> {
+    return await this.prisma.subcategoria.count({
+      where: {
+        id_categoria: idCategoria,
+        estatus: 'activo',
+      },
+    });
   }
 }
