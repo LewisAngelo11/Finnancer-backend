@@ -20,6 +20,12 @@ export class TransaccionesController {
     return this.transaccionesService.getAllTransactions(idUsuario);
   }
 
+  @Get('expenses')
+  getExpensesTransaction(@Req() req: any) {
+    const idUsuario = Number(req.usuario.sub);
+    return this.transaccionesService.getExpensesTransactions(idUsuario);
+  }
+  
   @Get('last-transactions')
   getLastTransactions(@Req() req: any) {
     const idUsuario = req.usuario.sub;
@@ -48,12 +54,6 @@ export class TransaccionesController {
     const idUsuario = req.usuario.sub;
     return this.transaccionesService.getIncomesTransactions(idUsuario);
   }
-  
-  @Get('expenses')
-  getExpensesTransaction(@Req() req: any) {
-    const idUsuario = req.usuario.sub;
-    return this.transaccionesService.getExpensesTransactions(idUsuario);
-  }
 
   @Patch('cancel')
   cancelTransaction(@Req() req: any, @Body() body: UpdateTransaccioneDto) {
@@ -71,4 +71,11 @@ export class TransaccionesController {
   updateTransaction(@Body() body: UpdateTransaccioneDto) {
     return this.transaccionesService.updateTransaction(body);
   }
+
+  @Get('total-cat/:idCategoria')
+  getTotalAndSumCategory(@Req() req: any, @Param('idCategoria', ParseIntPipe) idCategoria: number) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.getTotalAndSumCategory(idUsuario, idCategoria);
+  }
+
 }

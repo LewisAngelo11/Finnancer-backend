@@ -245,4 +245,47 @@ export class TransaccionesService {
 
     return transaccionUpdate;
   }
+
+  // MÉTODOS PARA EL DASHOARD
+  // Método que obtiene el total del mes de una subcategoría
+  async getTotalAndSumCategory(idUsuario: number, idCategoria: number) {
+    const now = new Date();
+    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+    const finMes = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // Suma de todas las transacciones de la categoría
+    const sum = await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        id_categoria: idCategoria,
+        fecha_transaccion: {
+          gte: inicioMes,
+          lte: finMes,
+        }
+      },
+      _sum: {
+        monto_total: true
+      }
+    });
+
+    // Listado de todas las transacciones de la categoría
+    const data = await this.prisma.transaccion.findMany({
+      where: {
+        id_usuario: idUsuario,
+        id_categoria: idCategoria,
+        fecha_transaccion: {
+          gte: inicioMes,
+          lte: finMes,
+        }
+      },
+      include: {
+        categoria: { select: { icono: true, nombre: true, mostrar_panel: true }}
+      }
+    });
+
+    return {
+      total: sum._sum.monto_total ?? 0,
+      transacciones: data
+    };
+  }
 }
