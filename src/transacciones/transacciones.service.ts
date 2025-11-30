@@ -246,6 +246,23 @@ export class TransaccionesService {
     return transaccionUpdate;
   }
 
+  // Método que obtiene todas las transacciones hechas por un perfil
+  async getAllTransactionsFromProfile(idUsuario: number, idPerfil: number) {
+    const transaction = await this.prisma.transaccion.findMany({
+      where: {
+        id_usuario: idUsuario,
+        id_perfil: idPerfil,
+      },
+      include: {
+        categoria: {
+          select: {icono: true, nombre: true},
+        },
+      },
+    });
+    
+    return transaction;
+  }
+
   // MÉTODOS PARA EL DASHOARD
   // Método que obtiene el total del mes de una subcategoría
   async getTotalAndSumCategory(idUsuario: number, idCategoria: number) {

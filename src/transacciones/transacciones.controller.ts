@@ -32,6 +32,13 @@ export class TransaccionesController {
     return this.transaccionesService.getLastTransactions(idUsuario);
   }
 
+  @Get('all-profile')
+  getAllTransactionsFromProfile(@Req() req: any) {
+    const idUsuario = Number(req.usuario.sub);
+    const idPerfil = Number(req.headers['x-perfil-id']);
+    return this.transaccionesService.getAllTransactionsFromProfile(idUsuario, idPerfil);
+  }
+
   @Get(':idTransaction')
   getOneTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
     return this.transaccionesService.getOneTransaction(idTransaction);
@@ -77,5 +84,4 @@ export class TransaccionesController {
     const idUsuario = req.usuario.sub;
     return this.transaccionesService.getTotalAndSumCategory(idUsuario, idCategoria);
   }
-
 }
