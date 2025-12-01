@@ -84,4 +84,10 @@ export class TransaccionesController {
     const idUsuario = req.usuario.sub;
     return this.transaccionesService.getTotalAndSumCategory(idUsuario, idCategoria);
   }
+
+  @Get('balance/:anio/:mes')
+  generateBalance(@Req() req: any, @Param('anio', ParseIntPipe) anio: number, @Param('mes', ParseIntPipe) mes: number) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.generateBalance(idUsuario, mes, anio);
+  }
 }

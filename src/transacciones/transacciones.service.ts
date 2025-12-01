@@ -3,11 +3,27 @@ import { CreateTransaccioneDto } from './dto/create-transaccione.dto';
 import { UpdateTransaccioneDto } from './dto/update-transaccione.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CategoriasService } from 'src/categorias/categorias.service';
+import { triggerAsyncId } from 'async_hooks';
 
 export interface CuotasData {
   id_transaccion: number;
   monto: number;
   fecha_vencimiento: Date | null;
+}
+
+export interface CategoriaBalance {
+  id_categoria: number | null;
+  nombre: string;
+  tipo: string;
+  monto_total: number;
+  subcategorias: SubcategoriaBalance[];
+}
+
+interface SubcategoriaBalance {
+  id_subcategoria: number | null;
+  nombre: string;
+  monto: number;
+  id_categoria: number | null;
 }
 
 @Injectable()
@@ -303,6 +319,129 @@ export class TransaccionesService {
     return {
       total: sum._sum.monto_total ?? 0,
       transacciones: data
+    };
+  }
+
+
+  // METODO PARA LOS BALANCES MENSUALES
+  async generateBalance(idUsuario: number, mes: number, anio: number) {
+    const inicioMes = new Date(anio, mes - 1, 1);
+    const finMes = new Date(anio, mes, 1); // primer día del siguiente mes
+
+    // Consultar todas las transacciones del mes
+    const transaccionesMensuales = await this.prisma.transaccion.findMany({
+      where: {
+        id_usuario: idUsuario,
+        fecha_transaccion: {
+          gte: inicioMes,
+          lt: finMes,
+        },
+      },
+      include: {
+        categoria: {
+          select: { nombre: true, tipo: true }
+        },
+        subcategoria: {
+          select: { nombre: true, tipo: true }
+        },
+      }
+    });
+
+    // Sumar todo los ingresos del mes
+    const ingresosMensualesTotales = await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        tipo: 'ingreso',
+        fecha_transaccion: {
+          gte: inicioMes,
+          lt: finMes,
+        },
+      },
+      _sum: {
+        monto_total: true,
+      },
+    });
+
+    // Sumar todos los egresos del mes
+    const egresosMensualesTotales = await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        tipo: 'egreso',
+        fecha_transaccion: {
+          gte: inicioMes,
+          lt: finMes,
+        },
+      },
+      _sum: {
+        monto_total: true,
+      },
+    });
+
+    // Remover duplicados basándose en id_categoria
+    const categoriasBalance: CategoriaBalance[] = Array.from(
+      transaccionesMensuales.reduce((map, t) => {
+        const id = t.id_categoria!;
+        const categoriaExistente = map.get(id);
+        
+        if (categoriaExistente) {
+          categoriaExistente.monto_total += Number(t.monto_total);
+        } else {
+          map.set(id, {
+            id_categoria: id,
+            nombre: t.categoria?.nombre ?? "",
+            tipo: t.tipo,
+            monto_total: Number(t.monto_total),
+            subcategorias: []
+          });
+        }
+        
+        return map;
+      }, new Map<number, CategoriaBalance>()).values()
+    );
+
+    // Filtar las subcategorías 
+    const subcategoriaBalance: SubcategoriaBalance[] = Array.from(
+      transaccionesMensuales.reduce((map, t) => {
+        const id = t.id_subcategoria!;
+        const subcategoriaExistente = map.get(id);
+        
+        if (subcategoriaExistente) {
+          subcategoriaExistente.monto += Number(t.monto_total);
+        } else {
+          map.set(id, {
+            id_subcategoria: id,
+            nombre: t.subcategoria?.nombre ?? "",
+            monto: Number(t.monto_total),
+            id_categoria: t.id_categoria!
+          });
+        }
+        
+        return map;
+      }, new Map<number, SubcategoriaBalance>()).values()
+    );
+
+    subcategoriaBalance.forEach(sub => {
+      if (!sub.id_subcategoria) return;
+
+      const categoria = categoriasBalance.find(cat => {
+        return sub.id_categoria === cat.id_categoria;
+      });
+      
+      if (categoria) {
+        categoria.subcategorias.push(sub);
+      }
+    });
+
+    const ingresosTotales = Number(ingresosMensualesTotales._sum.monto_total);
+    const egresosTotales = Number(egresosMensualesTotales._sum.monto_total);
+    // Calcular el resultado neto del mes
+    const resultadoNeto = ingresosTotales - egresosTotales;
+
+    return{
+      categoriasBalance,
+      ingresosTotales,
+      egresosTotales,
+      resultadoNeto,
     };
   }
 }
