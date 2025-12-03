@@ -64,10 +64,9 @@ export class AuthService {
         }
 
         // Comparar el código ingresado con el almacenado
-        if (Number(createUsuarioDto.codigoVerificacion) !== Number(codigoVerificacion.codigo)) {
-            // opcional: incrementar contador de intentos en la BD
-            throw new BadRequestException('Código de verificación incorrecto');
-        }
+        // if (Number(createUsuarioDto.codigoVerificacion) !== Number(codigoVerificacion.codigo)) {
+        //     throw new BadRequestException('Código de verificación incorrecto');
+        // }
 
         // Crear el nuevo usuario a la BD.
         const newUsuario = await this.userService.create(createUsuarioDto);
