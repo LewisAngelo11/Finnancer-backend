@@ -11,7 +11,11 @@ export class PerfilesService {
     // Función que crea un nuevo perfil
     async createProfile(idUsuario: number, createProfileDto: CreatePerfileDto) {
         const fechaActual = new Date()
-        const pinHash = await this.hashPin(createProfileDto.pin);
+
+        let pinHash: any;
+        if (createProfileDto.pin) {
+            pinHash = await this.hashPin(createProfileDto.pin);
+        }
 
         const perfil = await this.prisma.perfil.create({
             data: {

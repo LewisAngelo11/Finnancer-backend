@@ -40,7 +40,7 @@ export class PerfilesController {
   @Patch('update')
   updateProfile(@Req() req: any, @Body() body: UpdatePerfileDto) {
     const idUsuario = req.usuario.sub;
-    const idPerfil = Number(req.headers['x-perfil-id']);
+    const idPerfil = body.idPerfil;
     return this.perfilesService.updateProfile(idUsuario, idPerfil, body);
   }
 
