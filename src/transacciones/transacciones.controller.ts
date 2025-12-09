@@ -40,8 +40,9 @@ export class TransaccionesController {
   }
 
   @Get(':idTransaction')
-  getOneTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
-    return this.transaccionesService.getOneTransaction(idTransaction);
+  getOneTransaction(@Req() req: any, @Param('idTransaction', ParseIntPipe) idTransaction: number) {
+    const idUsuario = req.usuario.sub;
+    return this.transaccionesService.getOneTransaction(idUsuario, idTransaction);
   }
 
   @Get('amount/incomes')

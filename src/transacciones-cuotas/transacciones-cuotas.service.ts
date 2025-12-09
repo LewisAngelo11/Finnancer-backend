@@ -72,7 +72,11 @@ export class TransaccionesCuotasService {
     const sumaMontosCuotas = cuotasTransaccion.reduce((acumulador, cuota) => acumulador.add(cuota.pagado), new Decimal(0));
 
     // Obtener la transaccion a la que pertenecen las cuotas
-    const transaccion = await this.transacciones.getOneTransaction(idTransaccion);
+    const transaccion = await this.prisma.transaccion.findUnique({
+      where: {
+        id_transaccion: idTransaccion,
+      },
+    });
 
     if (!transaccion) throw new BadRequestException('No se encontró la transacción.');
 

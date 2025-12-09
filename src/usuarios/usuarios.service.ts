@@ -136,4 +136,29 @@ export class UsuariosService {
     
     return await bcrypt.hash(hash, saltOrRounds);
   }
+
+  // Método para restablecer la contraseña sin pedir la contraseña actual
+  async resetPassword(correo: string, newPassword: string) {
+    // Buscar usuario por correo
+    const usuario = await this.findByCorreo(correo);
+
+    if (!usuario) {
+      throw new UnauthorizedException('No existe un usuario con este correo.');
+    }
+
+    // Hashear la nueva contraseña
+    const newPassHash = await this.hashPassw(newPassword);
+
+    // Actualizar contraseña en BD
+    await this.prisma.usuario.update({
+      where: { correo },
+      data: {
+        contrasena: newPassHash
+      }
+    });
+
+    return {
+      mensaje: 'La contraseña ha sido restablecida exitosamente.'
+    };
+  }
 }

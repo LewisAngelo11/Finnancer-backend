@@ -50,6 +50,7 @@ export class AuthService {
     // Método para registrar un usuario nuevo
     async signUp(createUsuarioDto: CreateUsuarioDto): Promise<{ access_token: string, mensaje: string }> {
         const fechaActual = new Date();
+
         // Buscar el código de verificación asociado al correo
         const codigoVerificacion = await this.verificationService.getVerificationCode(createUsuarioDto.correo);
 
@@ -64,9 +65,16 @@ export class AuthService {
         }
 
         // Comparar el código ingresado con el almacenado
-        // if (Number(createUsuarioDto.codigoVerificacion) !== Number(codigoVerificacion.codigo)) {
-        //     throw new BadRequestException('Código de verificación incorrecto');
-        // }
+        if (Number(createUsuarioDto.codigoVerificacion) !== Number(codigoVerificacion.codigo)) {
+            throw new BadRequestException('Código de verificación incorrecto');
+        }
+
+        // Verificar si el correo ya existe
+        const existeUsuario = await this.userService.findByCorreo(createUsuarioDto.correo);
+
+        if (existeUsuario) {
+            throw new BadRequestException('El correo ya está registrado');
+        }
 
         // Crear el nuevo usuario a la BD.
         const newUsuario = await this.userService.create(createUsuarioDto);
@@ -195,9 +203,11 @@ export class AuthService {
     }
 
     // Método que verifica si el código esta expirado
-    verifyExpirationCode(fechaActual: Date, expiracion: Date): boolean {
-        if (fechaActual > expiracion) return false;
-        else return true;
+    verifyExpirationCode(now: Date, exp: Date | string): boolean {
+        const nowMs = now.getTime();
+        const expMs = new Date(exp).getTime();
+
+        return nowMs <= expMs;
     }
 
     // Función que valida si el correo es existente

@@ -50,7 +50,13 @@ export class TransaccionesService {
         id_perfil: idPerfil,
         id_subcategoria: createTransaccioneDto.idSubcategoria,
         id_persona: createTransaccioneDto.idPersona,
-      }
+      },
+      include: {
+        categoria: { select: { nombre: true } },
+        subcategoria: { select: { nombre: true } },
+        perfil: { select: { nombre: true } },
+        persona: { select: { nombre: true } },
+      },
     });
 
     const plazos = createTransaccioneDto.plazos;
@@ -71,7 +77,19 @@ export class TransaccionesService {
 
     return {
       mensaje: '¡Transaccion creada correctamente!',
-      transaccion,
+      transaccion: {
+        id_transaccion: transaccion.id_transaccion,
+        tipo: transaccion.tipo,
+        fecha_transaccion: transaccion.fecha_transaccion,
+        nota: transaccion.nota,
+        monto_total: transaccion.monto_total,
+        plazos: transaccion.plazos,
+        estatus: transaccion.estatus,
+        categoria: transaccion.categoria?.nombre || 'Sin categoría',
+        subcategoria: transaccion.subcategoria?.nombre || 'Sin Subcategoría',
+        persona: transaccion.persona?.nombre || 'Ninguno',
+        perfil: transaccion.perfil?.nombre || 'Ninguno',
+      },
       cuotas,
     }
   }
@@ -135,9 +153,10 @@ export class TransaccionesService {
   }
 
   // Método para obtener una transaccion por su ID
-  async getOneTransaction(idTransaccion: number) {
+  async getOneTransaction(idUsuario: number, idTransaccion: number) {
     return await this.prisma.transaccion.findUnique({
       where: {
+        id_usuario: idUsuario,
         id_transaccion: idTransaccion,
       },
       include: {
@@ -150,9 +169,18 @@ export class TransaccionesService {
 
   // Método que obtiene las últimas 10 transacciones mas recientes
   async getLastTransactions(idUsuario: number) {
+    const now = new Date();
+    // Primer día del mes actual
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // Último día del mes actual
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
     const lastTransactions = await this.prisma.transaccion.findMany({
       where: {
         id_usuario: idUsuario,
+        fecha_transaccion: {
+          gte: firstDayOfMonth,
+          lte: lastDayOfMonth,
+        },
       },
       orderBy: {
         fecha_transaccion: 'desc',

@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, Param, Req } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Post, Req } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
