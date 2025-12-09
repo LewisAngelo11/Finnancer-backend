@@ -45,6 +45,7 @@ export class TransaccionesService {
         nota: createTransaccioneDto.nota,
         monto_total: createTransaccioneDto.montoTotal,
         plazos: createTransaccioneDto.plazos,
+        fecha_transaccion: createTransaccioneDto.fechaTransaccion,
         id_categoria: createTransaccioneDto.idCategoria,
         id_usuario: idUsuario,
         id_perfil: idPerfil,
