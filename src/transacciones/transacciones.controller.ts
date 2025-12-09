@@ -103,4 +103,9 @@
       const idUsuario = req.usuario.sub;
       return this.transaccionesService.generateBalance(idUsuario, mes, anio);
     }
+
+    @Get('fees/:idTransaction')
+    getFeesTransaction(@Param('idTransaction', ParseIntPipe) idTransaction: number) {
+      return this.transaccionesService.getFeesTransaction(idTransaction);
+    }
   }

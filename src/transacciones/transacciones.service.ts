@@ -522,4 +522,18 @@ export class TransaccionesService {
       resultadoNeto,
     };
   }
+
+  // Esta función verifica que una transacción ya tiene abonos o no
+  async getFeesTransaction(idTransaction: number) {
+    const montoAbonado = await this.prisma.transaccion_cuota.aggregate({
+      where: {
+        id_transaccion: idTransaction,
+      },
+      _sum: {
+        pagado: true,
+      },
+    })
+
+    return montoAbonado;
+  }
 }
