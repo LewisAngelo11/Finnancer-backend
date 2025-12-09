@@ -155,6 +155,53 @@ export class TransaccionesService {
     })
   }
 
+  // Método que obtienen todas las transaciones que son de ingresos del mes actual
+  async getIncomesTransactionsCurrent(idUsuario: number) {
+    const fechaActual = new Date();
+    
+    // Primer día del mes actual
+    const primerDiaDelMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+    // Primer día del mes siguiente
+    const primerDiaDelMesSiguiente = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 1);
+    return await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        tipo: 'ingreso',
+        fecha_transaccion: {
+          gte: primerDiaDelMes,
+          lt: primerDiaDelMesSiguiente,
+        }
+      },
+      _sum: {
+        monto_total: true,
+      },
+    });
+  }
+
+  // Método que obtienen tosas las transaciones que son de egresos del mes actual
+  async getExpensesTransactionsCurrent(idUsuario: number) {
+    const fechaActual = new Date();
+    
+    // Primer día del mes actual
+    const primerDiaDelMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+    // Primer día del mes siguiente
+    const primerDiaDelMesSiguiente = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 1);
+
+    return await this.prisma.transaccion.aggregate({
+      where: {
+        id_usuario: idUsuario,
+        tipo: 'egreso',
+        fecha_transaccion: {
+          gte: primerDiaDelMes,
+          lt: primerDiaDelMesSiguiente,
+        },
+      },
+      _sum: {
+        monto_total: true,
+      }
+    })
+  }
+
   // Método para obtener una transaccion por su ID
   async getOneTransaction(idUsuario: number, idTransaccion: number) {
     return await this.prisma.transaccion.findUnique({
