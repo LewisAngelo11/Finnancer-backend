@@ -33,12 +33,24 @@ export class SubcategoriasService {
                 icono: createSubcategoriaDto.icono,
                 id_usuario: idUsuario
             },
+            include: {
+                categoria: {
+                    select: { nombre: true },
+                },
+            },
         });
 
         return {
-            mensaje: '¡Subcategoría creada exitósamente!',
-            subcategoria,
-        };
+            id_subcategoria: subcategoria.id_subcategoria,
+            nombre: subcategoria.nombre,
+            tipo: subcategoria.tipo,
+            estatus: subcategoria.estatus,
+            flujo: subcategoria.flujo,
+            categoria: subcategoria.categoria?.nombre,
+            mostrar_panel: subcategoria.mostrar_panel,
+            id_usuario: subcategoria.id_usuario,
+            icono: subcategoria.icono,
+        }
     }
 
     // Método que devuelve todas las subcategorias activas del usuario

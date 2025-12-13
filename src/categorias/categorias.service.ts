@@ -64,7 +64,7 @@ export class CategoriasService {
 
   // Método que crea una categoría personalizada del usuario
   async createCategory(idUsuario: number, createCategoryDto: CreateCategoriaDto) {
-    await this.prisma.categoria.create({
+    const categoriaNueva = await this.prisma.categoria.create({
       data: {
         nombre: createCategoryDto.nombre,
         tipo: createCategoryDto.tipo,
@@ -77,6 +77,7 @@ export class CategoriasService {
     
     return {
       mensaje: '¡Categoría creada!',
+      categoriaNueva,
     };
   }
 
